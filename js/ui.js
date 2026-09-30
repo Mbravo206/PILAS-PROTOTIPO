@@ -25,6 +25,12 @@ window.UI = (function () {
     return `<button type="button" class="${base}${variants[variant]}" ${pr} ${attrs(action, value)} ${disabled ? "disabled" : ""}>${ic}${label}</button>`;
   }
 
+  // Botón de texto · sin fondo, borde ni redondeo: la salida discreta de una decisión ("Entrar igual").
+  // Sigue siendo visible (ink, subrayado) y con área táctil de 44px de alto y todo el ancho.
+  function textButton(label, { action, value } = {}) {
+    return `<button type="button" class="btn w-full h-11 text-label text-ink underline underline-offset-4 select-none transition duration-200 ease-out active:opacity-70" ${attrs(action, value)}>${label}</button>`;
+  }
+
   // Botón de icono · 44×44, tonal, siempre con aria-label
   function iconButton(icon, ariaLabel, action) {
     return `<button type="button" class="btn w-11 h-11 rounded-full bg-line/60 active:bg-line inline-flex items-center justify-center transition duration-200 ease-out active:scale-[0.98]" aria-label="${ariaLabel}" ${attrs(action)}>
@@ -38,7 +44,6 @@ window.UI = (function () {
     alegria: `<path d="M33 58q17 20 34 0" stroke="#1F2240" stroke-width="4" stroke-linecap="round" fill="none"/>`,
     ansiedad: `<path d="M38 64l6-6 6 6 6-6 6 6" stroke="#1F2240" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
     aburrimiento: `<line x1="39" y1="63" x2="61" y2="63" stroke="#1F2240" stroke-width="4" stroke-linecap="round"/>`,
-    tristeza: `<path d="M38 70q12-11 24 0" stroke="#1F2240" stroke-width="4" stroke-linecap="round" fill="none"/>`,
     default: `<path d="M41 62q9 5 18 0" stroke="#1F2240" stroke-width="4" stroke-linecap="round" fill="none"/>`,
   };
 
@@ -95,6 +100,24 @@ window.UI = (function () {
       ${character(emotionId, Math.round(size * 0.8))}</span>`;
   }
 
+  // Avatar de una persona del grupo: color propio (`member.color`) + su inicial.
+  // Texto en ink; el morado (4.4:1, `bigText`) lleva la inicial en 18px/700, como el resto del design system.
+  function personAvatar(member, size = 40) {
+    const fs = Math.round(Math.max(size * 0.45, member.bigText ? 18 : 12));
+    return `<span class="inline-flex items-center justify-center rounded-full border border-line shrink-0 font-bold text-ink select-none"
+      style="width:${size}px;height:${size}px;background:${member.color};font-size:${fs}px;line-height:1" role="img" aria-label="${member.name}">${member.name[0]}</span>`;
+  }
+
+  // Flor de regalo: la que un amigo te manda en una nota. Mismo trazo grueso ink que el personaje.
+  function flower(size = 96) {
+    const petals = [0, 72, 144, 216, 288].map((a) =>
+      `<ellipse cx="50" cy="26" rx="13" ry="18" fill="#C28CAE" stroke="#1F2240" stroke-width="3" transform="rotate(${a} 50 46)"/>`).join("");
+    return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" role="img" aria-label="Una flor">
+      <path d="M50 64v30" stroke="#1F2240" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <path d="M50 82q-16-2-20-14 14-2 20 14z" fill="#6698CC" stroke="#1F2240" stroke-width="3" stroke-linejoin="round"/>
+      ${petals}<circle cx="50" cy="46" r="10" fill="#FFEC89" stroke="#1F2240" stroke-width="3"/></svg>`;
+  }
+
   // Etiqueta informativa (no interactiva): borde line, texto caption. P. ej. "En el reto"
   function tag(label) {
     return `<span class="inline-flex items-center px-sm h-7 rounded-full border border-line text-caption text-ink-soft">${label}</span>`;
@@ -131,5 +154,5 @@ window.UI = (function () {
     </div>`;
   }
 
-  return { button, iconButton, character, chip, emotionCard, emotionDot, avatar, tag, toggle, pilasIcon };
+  return { button, textButton, iconButton, character, chip, emotionCard, emotionDot, avatar, personAvatar, flower, tag, toggle, pilasIcon };
 })();

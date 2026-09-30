@@ -73,7 +73,7 @@ antes de marcar Done → `/commit` → `/plan-test-cases` (3 casos manuales).
 - Nunca bloquear la entrada a la red. Sin conteos regresivos, rachas, puntos,
   niveles, trofeos ni patrones oscuros (deceptive.design).
 - Rojo (`state-error`) solo para errores técnicos. `state-fuera` siempre al 30%.
-- Todo el texto en `ink`; blanco solo sobre `primary`. Tristeza con texto 18px/700.
+- Todo el texto en `ink`; blanco solo sobre `primary`. El morado del avatar de Vale (#967CC7) lleva la inicial en 18px/700.
 - Áreas táctiles ≥ 44px. Animación 200ms ease-out solo como respuesta a un
   toque; respetar `prefers-reduced-motion`.
 - Copy: tuteo, frases cortas, botones que dicen qué pasa, sin emojis ni MAYÚSCULAS.

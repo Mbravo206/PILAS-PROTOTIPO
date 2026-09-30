@@ -6,15 +6,15 @@ window.PILAS_DATA = (function () {
     { id: "alegria",      label: "Alegría",      bg: "#FFEC89", fill: "#F2CF3D", pause: "Llegas con alegría. ¿Para qué entras?" },
     { id: "ansiedad",     label: "Ansiedad",     bg: "#FFAD33", fill: "#E8901A", pause: "Llegas con ansiedad. ¿Respiras un momento?" },
     { id: "aburrimiento", label: "Aburrimiento", bg: "#C28CAE", fill: "#A86F93", pause: "Llegas aburrido. ¿Qué buscas?" },
-    // Tristeza: 4.4:1 con ink → su texto va en 18px / 700
-    { id: "tristeza",     label: "Tristeza",     bg: "#967CC7", fill: "#7B61AE", pause: "Llegas con tristeza. ¿Qué necesitas?", bigText: true },
   ];
 
-  // Tiempo de la pantalla 8. Tres opciones: menos para elegir. "Ahora no" sigue entrando sin tiempo.
+  // Tiempo de la pantalla 8: tres tiempos + "Indefinido" (minutes: null = sin aviso de tiempo).
+  // "Ahora no" del check-in también entra sin tiempo.
   const times = [
-    { id: "5",  label: "5 min",  minutes: 5 },
-    { id: "10", label: "10 min", minutes: 10 },
-    { id: "15", label: "15 min", minutes: 15 },
+    { id: "5",     label: "5 min",      minutes: 5 },
+    { id: "10",    label: "10 min",     minutes: 10 },
+    { id: "15",    label: "15 min",     minutes: 15 },
+    { id: "indef", label: "Indefinido", minutes: null },
   ];
 
   // Pantalla 8. PENDIENTE: reemplazar con lo que digan las entrevistas.
@@ -33,21 +33,24 @@ window.PILAS_DATA = (function () {
     { id: "pilas",    name: "PILAS",    icon: null,       social: false, color: "#FBF8F1", isPilas: true },
   ];
 
-  // Pantalla 13/14: grupo de amigos. El color de cada avatar reutiliza los tokens de emoción
-  // (no es un juicio sobre esa persona, solo el color que le tocó al personaje).
+  // Pantalla 13/14: grupo de amigos. `color` es el color del avatar, uno distinto por persona (paleta del
+  // design system; no es un juicio, solo el color que le tocó). El avatar lleva su inicial.
+  // bigText: el morado da 4.4:1 con ink, así que su inicial va en 18px / 700.
+  // El tiempo de uso solo se muestra en la fila propia (timeLabel/weekLabel): el de los demás no se ve.
   const group = [
-    { id: "dani", name: "Dani", emotion: "aburrimiento", timeLabel: "2 h 30 min", weekLabel: "13 h 40 min" },
-    { id: "juan", name: "Juan", emotion: "calma",         timeLabel: "1 h 20 min", weekLabel: "9 h" },
-    { id: "mafe", name: "Mafe", emotion: "alegria",       timeLabel: "40 min",     weekLabel: "5 h 10 min" },
-    { id: "sami", name: "Sami", emotion: "calma",         timeLabel: "25 min",     weekLabel: "6 h 45 min", self: true },
-    { id: "vale", name: "Vale", emotion: "tristeza",      timeLabel: "1 h 5 min",  weekLabel: "7 h 50 min" },
+    { id: "dani", name: "Dani", color: "#C28CAE" },
+    { id: "juan", name: "Juan", color: "#6698CC" },
+    { id: "mafe", name: "Mafe", color: "#FFEC89" },
+    { id: "sami", name: "Sami", color: "#FFAD33", self: true, timeLabel: "25 min", weekLabel: "6 h 45 min" },
+    { id: "vale", name: "Vale", color: "#967CC7", bigText: true },
   ];
 
   // Retos activos (siempre se muestran exactamente 2): invitaciones del grupo, nunca un bloqueo ni una cuenta regresiva.
   // "friends" = quiénes ya le entraron (sin contar a Sami, cuya adhesión vive en el estado de la sesión).
+  // "done" = quiénes de esos ya lo cumplieron (se muestra con un check, sin puntos).
   const challenges = [
-    { id: "nocturno", title: "Nada de redes después de las 11 pm", friends: ["juan", "vale"], selfDefault: true },
-    { id: "descanso", title: "Descanso de estudio sin celular",    friends: ["mafe"],          selfDefault: false },
+    { id: "nocturno", title: "Nada de redes después de las 11 pm", friends: ["juan", "vale"], done: [],       selfDefault: false },
+    { id: "descanso", title: "Descanso de estudio sin celular",    friends: ["mafe"],          done: ["mafe"], selfDefault: false },
   ];
 
   // "Los premiados de hoy" (Grupo): reconoce sin puntos ni ranking, solo 2 personas.
@@ -63,16 +66,26 @@ window.PILAS_DATA = (function () {
   const friendNotes = [
     { id: "n1", from: "vale", message: "¿Salimos a jugar fútbol a las 5?" },
     { id: "n2", from: "juan", message: "Nosotros dos en el parque. ¿Vamos el sábado?", drawing: true },
+    { id: "n3", from: "mafe", message: "Te mandé esta flor para que te concentres.", gift: "flor" },
   ];
 
   // Responder al amigo: respuestas rápidas, sin abrir una bandeja de mensajes.
-  const friendReplies = ["¡Dale!", "Ahora no puedo", "Te cuento después", "Contando con eso"];
+  const friendReplies = ["¡Dale!", "¡Gracias!", "Contando con eso"];
+
+  // Responder al amigo con un muñequito: una respuesta sin palabras. `face` es la carita (id de emoción) que se dibuja.
+  const replyDolls = [
+    { id: "listo",   label: "Listo",            face: "alegria" },
+    { id: "pensare", label: "Lo pensaré",       face: "aburrimiento" },
+    { id: "ahorita", label: "Ahorita no puedo", face: "ansiedad" },
+    { id: "luego",   label: "Te cuento luego",  face: "calma" },
+  ];
 
   // Dejarle algo a un amigo: mensajes sugeridos además de escribir el propio.
   const noteSuggestions = ["¿Salimos un rato?", "Te extraño, hablemos", "¿Vemos algo juntos?"];
 
   // Descanso: tiempos sugeridos y sugerencia según el ritmo de Sami (dato de ejemplo).
   const breakTimes = [
+    { id: "2",  label: "2 min",  minutes: 2 }, // acceso rápido desde Hoy
     { id: "10", label: "10 min", minutes: 10 },
     { id: "20", label: "20 min", minutes: 20 },
     { id: "30", label: "30 min", minutes: 30 },
@@ -131,7 +144,7 @@ window.PILAS_DATA = (function () {
 
   return {
     emotions, times, alternatives, apps, group, challenges, challengeSuggestions, rewarded, breakStats,
-    friendNotes, friendReplies, noteSuggestions, breakTimes, breakSuggestion, sampleBreaks,
+    friendNotes, friendReplies, replyDolls, noteSuggestions, breakTimes, breakSuggestion, sampleBreaks,
     goals, goalSuggestions, achievements, focus, sampleEntries,
     EMO: byId(emotions), APP: byId(apps), GROUP: byId(group),
   };

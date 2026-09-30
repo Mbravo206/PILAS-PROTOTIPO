@@ -84,7 +84,7 @@ const state = {
 
 | # | `data-screen` | Entra desde | Acciones → destino | Criterio de aceptación |
 |---|---|---|---|---|
-| 13 | `inicio` | Ícono PILAS del celular / pestaña "Hoy" | "Volver al inicio" → 0 · "Reiniciar prototipo" | Entradas del día, sin totales ni rachas |
+| 13 | `inicio` | Ícono PILAS del celular / pestaña "Hoy" | "Volver al inicio" → 0 · "Reiniciar prototipo" | Sin lista de entradas del día; sin totales ni rachas |
 | 0 | `home` | Arranque de la app / `cierre` / "Volver al inicio" en Hoy | Tocar Instagram o TikTok → interstitial o check-in · PILAS → 13 | Solo redes con pausa + PILAS, sin apps decorativas |
 | — | interstitial (hoja) | Tocar una red con descanso o reto activo | "Seguir descansando/el reto" → 0 · "Entrar igual" → sigue el flujo | Mismo peso visual, nunca bloquea |
 | `nota` | `nota` | Cola de notas de amigos | "Responderle" → `responder` · "Entrar igual" → check-in | Una sola vez por nota, no ve el uso |
@@ -120,8 +120,8 @@ const state = {
 
 | Tema | Qué hace hoy el código | Dónde cambiarlo |
 |---|---|---|
-| "Sin tiempo" | Ya no es chip. Solo ocurre con "Ahora no" del check-in: no hay aviso, se sale con la X del feed | `data.js → times` |
-| 5 emociones en 2 columnas | La quinta ocupa el ancho completo; tarjetas siempre de color, con la carita sobre un círculo blanco | `app.js → renderCheckin`, `ui.js → emotionCard` |
+| "Sin tiempo" | Vuelve como chip "Indefinido" (pantalla 8) y también ocurre con "Ahora no": no hay aviso de tiempo, se sale con la X del feed | `data.js → times` |
+| 4 emociones en 2 columnas | Se quitó Tristeza: queda una grilla 2 × 2; tarjetas siempre de color, con la carita sobre un círculo blanco | `app.js → renderCheckin`, `ui.js → emotionCard` |
 | Navegación inferior | 4 destinos: Hoy · Grupo · Descanso · Yo (todos funcionan). El design system (§ BottomNav) aún dice Hoy · Emociones · Intenciones · Yo — desactualizado | `app.js → bottomNav` |
 | Ajuste "Pausa antes de abrir redes" | Apagado: abrir una red entra directo, sin nota ni check-in | `app.js → actions["open-app"]` |
 | Grupo | "Los premiados de hoy" muestra 2 personas, sin puntos ni ranking; "Retos activos" muestra siempre 2 | `data.js → rewarded, challenges` |

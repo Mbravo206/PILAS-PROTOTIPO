@@ -28,9 +28,8 @@ Solo relleno, siempre con texto `ink`. **Nunca indican bien o mal.** Provisional
 | Alegría | #FFEC89 | #F2CF3D | Llegas con alegría. ¿Para qué entras? |
 | Ansiedad | #FFAD33 | #E8901A | Llegas con ansiedad. ¿Respiras un momento? |
 | Aburrimiento | #C28CAE | #A86F93 | Llegas aburrido. ¿Qué buscas? |
-| Tristeza | #967CC7 | #7B61AE | Llegas con tristeza. ¿Qué necesitas? |
 
-- Tristeza tiene 4.4:1 con `ink`: su texto va en **18px / 700**.
+- Son 4 emociones. Tristeza se quitó del selector (decisión del grupo); su morado #967CC7 (4.4:1 con `ink`) sigue como color del avatar de Vale, con la inicial en **18px / 700**.
 - En Tailwind: `bg-emo-calma`, `bg-emo-calma-fill`, etc.
 
 | Estado | Hex | Regla |
@@ -72,7 +71,7 @@ Solo relleno, siempre con texto `ink`. **Nunca indican bien o mal.** Provisional
 | **ListRow** | Filas de ajustes de 56px. | pantalla 13 |
 | **BottomSheet** | Sube en 200ms, fondo `ink` al 40%. Se cierra tocando fuera o "Ahora no". | `#sheet-layer` |
 | **BottomNav** | 4 destinos: Hoy · Grupo · Descanso · Yo. | pantalla 13 |
-| **Personaje** | Blob por emoción con cara: ojos + boca que cambia según la emoción (sonrisa en calma/alegría, zigzag en ansiedad, línea en aburrimiento, mueca en tristeza). `face="minima"` (con cara) o `"ninguna"` (blob liso). Al tocarlo, parpadea. | `UI.character()` |
+| **Personaje** | Blob por emoción con cara: ojos + boca que cambia según la emoción (sonrisa en calma/alegría, zigzag en ansiedad, línea en aburrimiento). `face="minima"` (con cara) o `"ninguna"` (blob liso). Al tocarlo, parpadea. | `UI.character()` |
 | **Avatar** | Personaje sobre `surface` con borde `line`. Sin personaje: inicial blanca sobre `primary`. | — |
 | **Screen / PauseScreen** | Esqueleto de pantalla (safe areas, título, acciones, nav) y plantilla de pausa a pantalla completa. | `screen()` en `app.js` |
 
@@ -131,5 +130,5 @@ Piezas 9:16. El personaje se asoma desde abajo: solo ojos, la boca queda fuera d
 ## 12. Pendientes
 
 - Emociones finales (diagrama de afinidades) → editar `js/data.js` y `js/tailwind.config.js`.
-- 5 emociones en grilla de 2 columnas: hoy la quinta ocupa el ancho completo (alternativas: scroll, 3 columnas o número par).
+- 4 emociones en grilla de 2 columnas (2 × 2).
 - Cara del personaje: `minima` vs `ninguna`, probar con 2 adolescentes.

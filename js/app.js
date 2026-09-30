@@ -3,7 +3,7 @@
 // 0 → ¿Cómo te sientes? → 8 (otra cosa + tiempo) → 9 → feed → 10 → ¿Cómo te sientes después? → 0 (+ 12).
 (function () {
   const D = window.PILAS_DATA;
-  const { button, iconButton, character, chip, emotionCard, emotionDot, avatar, toggle, pilasIcon } = window.UI;
+  const { button, textButton, iconButton, character, chip, emotionCard, emotionDot, avatar, personAvatar, flower, toggle, pilasIcon } = window.UI;
 
   // ---------- Modo demo: 1 min elegido = 5 s reales ----------
   let demo = new URLSearchParams(location.search).get("demo") === "1";
@@ -40,6 +40,7 @@
     saved: false,     // evita guardar dos veces la misma sesión
     currentNote: null, // pantalla 10b: nota de amigo pendiente de mostrar
     replyChoice: null, // respuesta rápida elegida al responder al amigo
+    replyChar: null,   // muñequito (emoción) elegido al responder al amigo
     ...initialProfile(),
   };
 
@@ -92,7 +93,7 @@
     const entries = loadEntries();
     return entries.length ? entries.slice().sort((a, b) => new Date(b.date) - new Date(a.date))[0] : null;
   }
-  const timeIdForMinutes = (m) => (D.times.find((t) => t.minutes === m) || {}).id ?? null;
+  const timeIdForMinutes = (m) => (m == null ? null : (D.times.find((t) => t.minutes === m) || {}).id ?? null);
 
   function resetAll() {
     try { localStorage.removeItem(KEY); } catch (_) {}
@@ -177,15 +178,16 @@
         <div class="h-full flex flex-col px-lg pt-2xl text-center" style="background:${e.bg}">
           <div class="flex justify-center">${character("alegria", 120)}</div>
           <div class="flex items-center justify-center gap-sm mt-xl">
-            ${avatar(friend.emotion, 32)}
+            ${personAvatar(friend, 32)}
             <p class="text-label text-ink">${friend.name} te dejó algo antes de entrar</p>
           </div>
           <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-md">${n.message}</h1>
           ${n.drawing ? `<div class="bg-surface rounded-card border border-line p-md mt-lg mx-auto"><p class="text-caption text-ink-soft">Te mandó un dibujo</p></div>` : ""}
+          ${n.gift === "flor" ? `<div class="bg-surface rounded-card border border-line p-md mt-lg mx-auto flex flex-col items-center gap-xs">${flower(96)}<p class="text-caption text-ink-soft">${friend.name} te mandó una flor</p></div>` : ""}
           <p class="text-label text-ink-soft mt-lg">${friend.name} no ve si entras, cuánto tiempo ni cómo te sientes.</p>
           <div class="mt-auto pb-xl flex flex-col gap-sm">
-            ${button("Responderle", { variant: "tonal", action: "note-reply" })}
-            ${button("Entrar igual", { variant: "tonal", action: "note-enter" })}
+            ${button("Responderle", { action: "note-reply" })}
+            ${textButton("Entrar igual", { action: "note-enter" })}
           </div>
         </div>`;
     },
@@ -195,11 +197,27 @@
       const n = state.currentNote;
       const friend = D.GROUP[n.from];
       const chips = D.friendReplies.map((r, i) => chip(r, { action: "pick-reply", value: i, selected: state.replyChoice === i })).join("");
+      // Muñequitos para responder sin palabras ("Listo", "Lo pensaré"…): el personaje con una carita. Elegido = anillo primary.
+      const dolls = D.replyDolls.map((e) => {
+        const on = state.replyChar === e.id;
+        return `<button type="button" class="hit-44 relative flex flex-col items-center gap-xs p-xs rounded-card border-2 transition duration-200 ease-out active:scale-[0.98] ${on ? "border-primary bg-line/60" : "border-transparent"}"
+          aria-pressed="${on}" aria-label="Responder: ${e.label}" data-action="pick-reply-char" data-value="${e.id}">
+          ${character(e.face, 52)}<span class="text-caption text-ink text-center">${e.label}</span></button>`;
+      }).join("");
       return screen({
         title: `Respóndele a ${friend.name}`,
-        body: `<div class="flex flex-wrap gap-sm">${chips}</div>`,
+        body: `
+          <div class="flex items-center gap-md bg-surface rounded-card border border-line p-md">
+            ${personAvatar(friend, 40)}
+            <p class="text-body text-ink">${n.message}</p>
+          </div>
+          <h2 class="text-title-md text-ink mt-xl">Dile algo corto</h2>
+          <div class="flex flex-wrap gap-sm mt-sm">${chips}</div>
+          <h2 class="text-title-md text-ink mt-xl">O mándale un muñequito</h2>
+          <div class="grid grid-cols-4 gap-xs mt-sm">${dolls}</div>
+          <p class="text-caption text-ink-soft mt-lg">${friend.name} lo ve antes de abrir una red. No ve nada de tu uso.</p>`,
         actions:
-          button("Enviar", { action: "reply-send", disabled: state.replyChoice === null }) +
+          button("Enviar", { action: "reply-send", disabled: state.replyChoice === null && !state.replyChar }) +
           button("Volver", { variant: "secondary", action: "reply-back" }),
       });
     },
@@ -215,7 +233,7 @@
         bg: e ? e.bg : "",
         body: `
           <div class="flex justify-center py-md">${avatar(state.emotionIn, 96)}</div>
-          <h2 class="text-title-md text-ink mt-lg">¿Cuánto tiempo?</h2>
+          <h2 class="text-title-md text-ink mt-lg">¿Cuánto tiempo piensas usar la app?</h2>
           <div class="flex flex-wrap gap-sm mt-md">${times}</div>`,
         actions: opts + button("Igual quiero entrar", { variant: "secondary", action: "alt-enter" }),
       });
@@ -289,37 +307,8 @@
 
     // 13. Inicio — el día sin puntaje (sin totales, sin rachas)
     inicio() {
-      const today = new Date().toDateString();
-      const entries = loadEntries()
-        .filter((x) => new Date(x.date).toDateString() === today)
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
       const h = new Date().getHours();
       const greet = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
-      const hhmm = (d) => new Date(d).toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" });
-      const emoLabel = (id) => D.EMO[id]?.label.toLowerCase() || "sin nombrar";
-
-      const last = entries[0];
-      const featured = last ? `
-        <div class="bg-surface rounded-card border border-line p-lg">
-          <p class="text-caption text-ink-soft">Última vez · ${D.APP[last.app]?.name || ""} · ${hhmm(last.date)}</p>
-          <div class="flex items-center gap-md mt-md">
-            ${character(last.emotionIn, 48)}
-            <i data-lucide="arrow-right" class="w-6 h-6 text-ink-soft" stroke-width="1.5"></i>
-            ${character(last.emotionOut, 48)}
-          </div>
-          <p class="text-body text-ink mt-md">Llegaste con ${emoLabel(last.emotionIn)}. Saliste con ${emoLabel(last.emotionOut)}.</p>
-          <!-- IntentionSummary: lo que dijiste vs. lo que pasó, sin calificar -->
-          <p class="text-label text-ink-soft mt-sm">${last.minutes ? `Dijiste ${last.minutes} min · Estuviste ${last.realMinutes} min` : `Estuviste ${last.realMinutes} min`}</p>
-        </div>` : `<p class="text-body text-ink-soft">Hoy todavía no has entrado a tus redes.</p>`;
-
-      const rows = entries.map((x) => `
-        <li class="min-h-[56px] flex items-center gap-md py-sm border-b border-line">
-          <span class="inline-flex gap-xs">${emotionDot(x.emotionIn)}${emotionDot(x.emotionOut)}</span>
-          <span class="flex-1">
-            <span class="block text-label text-ink">${D.APP[x.app]?.name || ""}${x.emotionIn ? ` · Llegaste con ${emoLabel(x.emotionIn)}` : ""}</span>
-            <span class="block text-caption text-ink-soft">${hhmm(x.date)} · ${x.realMinutes} min</span>
-          </span>
-        </li>`).join("");
 
       const confirmation = state.noteConfirmation;
       state.noteConfirmation = null; // se muestra una sola vez, justo después de enviar
@@ -329,14 +318,16 @@
           <div class="screen-body px-lg pt-lg">
             <div class="flex items-center justify-between">
               <h1 tabindex="-1" class="text-title-lg text-ink outline-none">${greet}, Sami</h1>
-              ${avatar("calma", 40)}
+              ${personAvatar(D.GROUP.sami, 40)}
             </div>
             <!-- Card featured: la única con shadow-pilas de esta pantalla -->
             <div class="mt-lg">${challengeCard()}</div>
             <div class="mt-xl">${groupSection()}</div>
-            <h2 class="text-title-md text-ink mt-xl">Tu última vez</h2>
-            <div class="mt-sm">${featured}</div>
-            ${entries.length ? `<h2 class="text-title-md text-ink mt-xl">Hoy</h2><ul class="mt-sm">${rows}</ul>` : ""}
+            <div class="bg-surface rounded-card border border-line p-lg mt-xl">
+              <h2 class="text-title-md text-ink">Crea un foco</h2>
+              <p class="text-body text-ink-soft mt-sm">¿Aburrido/a o estresado/a? Prueba esto en 2 min.</p>
+              <div class="mt-md">${button("Crear un foco", { variant: "secondary", action: "descanso-quick" })}</div>
+            </div>
 
             <div class="bg-surface rounded-card border border-line p-lg mt-xl">
               <h2 class="text-title-md text-ink">Déjale algo a un amigo</h2>
@@ -362,7 +353,7 @@
             <h1 tabindex="-1" class="text-title-lg text-ink outline-none">Tu grupo</h1>
             <p class="text-body text-ink-soft mt-xs">Los del colegio</p>
             <ul class="mt-lg bg-surface rounded-card border border-line px-md">${groupRows(D.group)}</ul>
-            <p class="text-caption text-ink-soft mt-sm">Cada uno decide si comparte su tiempo.</p>
+            <p class="text-caption text-ink-soft mt-sm">Aquí solo ves quién está en el reto. Tu tiempo lo ves solo tú.</p>
 
             <h2 class="text-title-md text-ink mt-xl">Los premiados de hoy</h2>
             <div class="mt-sm">${rewardedSection()}</div>
@@ -498,7 +489,7 @@
         <div class="h-full flex flex-col">
           <div class="screen-body px-lg pt-lg">
             <div class="flex items-center gap-md">
-              ${avatar("calma", 56)}
+              ${personAvatar(D.GROUP.sami, 56)}
               <div><h1 tabindex="-1" class="text-title-lg text-ink outline-none">Sami</h1>
                 <p class="text-label text-ink-soft">Usas PILAS desde ${D.focus.since}</p></div>
             </div>
@@ -571,7 +562,7 @@
         <p class="text-caption text-ink-soft">Reto de hoy</p>
         <h2 class="text-title-md text-ink mt-xs">${c.title}</h2>
         <div class="flex items-center gap-sm mt-md">
-          <span class="flex -space-x-2">${joined.map((m) => avatar(m.emotion, 28)).join("")}</span>
+          <span class="flex -space-x-2">${joined.map((m) => personAvatar(m, 28)).join("")}</span>
           ${names ? `<p class="text-label text-ink-soft">${names} ya le entraron</p>` : ""}
         </div>
         <div class="mt-lg">${challengeButton(c.id, "Estás en el reto", "Unirme al reto", "tonal")}</div>
@@ -588,15 +579,33 @@
       <ul class="mt-sm bg-surface rounded-card border border-line px-md">${groupRows(D.group.slice(0, 4))}</ul>`;
   }
 
-  // Filas de "Tu grupo": tiempo de hoy y de la semana, sin ranking de éxito ni orden por uso.
+  // Estado de cada persona frente a los retos: "cumplio" | "enCurso" | null. Sin puntos ni ranking.
+  function retoStatus(m) {
+    if (m.self) return Object.values(state.joinedChallenges).some(Boolean) ? "enCurso" : null;
+    const mine = D.challenges.filter((c) => c.friends.includes(m.id));
+    if (!mine.length) return null;
+    return mine.some((c) => c.done.includes(m.id)) ? "cumplio" : "enCurso";
+  }
+
+  // Estado en texto con check sobre fondo plano (chip), nunca un botón relleno.
+  function retoChip(status) {
+    if (!status) return "";
+    const done = status === "cumplio";
+    return `<span class="inline-flex items-center gap-xs px-sm h-7 rounded-full bg-line/60 text-caption text-ink shrink-0">
+      ${done ? `<i data-lucide="check" class="w-4 h-4" stroke-width="2" aria-hidden="true"></i>` : ""}${done ? "Cumplió" : "En curso"}</span>`;
+  }
+
+  // Filas de "Tu grupo": solo si cada quien está en el reto o lo cumplió, sin tiempos de los demás.
+  // El tiempo propio es opcional y privado: solo aparece en la fila de Sami si comparte el ajuste.
   function groupRows(members) {
     return members.map((m) => `
       <li class="min-h-[56px] flex items-center gap-md py-sm border-b border-line last:border-0">
-        ${avatar(m.emotion, 36)}
+        ${personAvatar(m, 36)}
         <span class="flex-1">
           <span class="block text-label text-ink">${m.name}${m.self ? ` <span class="text-caption text-ink-soft">Tú</span>` : ""}</span>
-          <span class="block text-caption text-ink-soft">Hoy ${m.timeLabel} · Semana ${m.weekLabel}</span>
+          ${m.self && state.settings.shareTime ? `<span class="block text-caption text-ink-soft">Hoy ${m.timeLabel} · solo tú lo ves</span>` : ""}
         </span>
+        ${retoChip(retoStatus(m))}
       </li>`).join("");
   }
 
@@ -617,7 +626,7 @@
         <div class="bg-surface rounded-card border border-line p-lg">
           <p class="text-label text-ink font-medium">${c.title}</p>
           <div class="flex items-center gap-sm mt-sm">
-            <span class="flex -space-x-2">${friends.map((m) => avatar(m.emotion, 24)).join("")}${selfIn ? avatar("calma", 24) : ""}</span>
+            <span class="flex -space-x-2">${friends.map((m) => personAvatar(m, 24)).join("")}${selfIn ? personAvatar(D.GROUP.sami, 24) : ""}</span>
             ${label ? `<p class="text-caption text-ink-soft">${label}</p>` : ""}
           </div>
           <div class="mt-md">${challengeButton(c.id, "Estás en el reto", "Le entro", "secondary")}</div>
@@ -626,12 +635,18 @@
     return `<div class="flex flex-col gap-sm">${cards}</div>`;
   }
 
-  // Botón del reto con feedback: al unirse se pinta verde con check (y "salta" 200 ms); al salir vuelve a neutro.
+  // Reto: sin unirse, un botón; unido, solo un chip de estado con check (fondo plano, no es un botón)
+  // y una salida discreta "Salir del reto". La salida es texto subrayado, no compite con nada.
   function challengeButton(id, onLabel, offLabel, offVariant) {
     const on = !!state.joinedChallenges[id];
-    return on
-      ? button(onLabel, { variant: "active", icon: "check", pressed: true, action: "toggle-challenge", value: id })
-      : button(offLabel, { variant: offVariant, pressed: false, action: "toggle-challenge", value: id });
+    if (!on) return button(offLabel, { variant: offVariant, pressed: false, action: "toggle-challenge", value: id });
+    return `
+      <div class="flex items-center justify-between gap-sm">
+        <span class="inline-flex items-center gap-xs px-md h-9 rounded-full bg-line/60 text-label text-ink">
+          <i data-lucide="check" class="w-4 h-4" stroke-width="2" aria-hidden="true"></i>${onLabel}</span>
+        <button type="button" class="hit-44 relative text-caption text-ink underline underline-offset-2 transition duration-200 ease-out active:opacity-70"
+          data-action="toggle-challenge" data-value="${id}">Salir del reto</button>
+      </div>`;
   }
 
   // "Los premiados de hoy" (Grupo): 2 personas reconocidas, sin puntos, sin ranking, sin orden.
@@ -640,7 +655,7 @@
       const m = D.GROUP[r.id];
       return `
         <li class="min-h-[64px] flex items-center gap-md py-sm border-b border-line last:border-0">
-          ${avatar(m.emotion, 40)}
+          ${personAvatar(m, 40)}
           <span class="flex-1">
             <span class="block text-label text-ink">${m.name}</span>
             <span class="block text-caption text-ink-soft">${r.note}</span>
@@ -729,7 +744,7 @@
   }
 
   // ---------- Interstitial: "Rato sin redes" / "Reto" antes de abrir una red ----------
-  // Mismo peso visual en las dos opciones, nunca bloquea la entrada.
+  // "Seguir..." es el botón oscuro; "Entrar igual" es texto plano, pero siempre visible: nunca bloquea la entrada.
   function openInterstitial(kind, challenge) {
     const layer = $("#sheet-layer");
     const keepAction = kind === "descanso" ? "interstitial-keep-descanso" : "interstitial-keep-reto";
@@ -742,8 +757,8 @@
       <div class="w-10 h-1 rounded-full bg-line mx-auto mb-lg" aria-hidden="true"></div>
       <h2 id="sheet-title" class="text-title-md text-ink">${title}</h2>
       <div class="flex flex-col gap-sm mt-lg">
-        ${button(keepLabel, { variant: "tonal", action: keepAction })}
-        ${button("Entrar igual", { variant: "tonal", action: "interstitial-enter" })}
+        ${button(keepLabel, { action: keepAction })}
+        ${textButton("Entrar igual", { action: "interstitial-enter" })}
       </div>`;
     showSheet();
   }
@@ -761,7 +776,7 @@
 
   // Sigue el flujo normal de abrir una red: nota de un amigo (si hay) y luego el check-in.
   function continueOpenApp() {
-    if (state.noteQueue.length) { state.currentNote = state.noteQueue.shift(); state.replyChoice = null; go("nota"); return; }
+    if (state.noteQueue.length) { state.currentNote = state.noteQueue.shift(); state.replyChoice = null; state.replyChar = null; go("nota"); return; }
     afterNote();
   }
   const afterNote = () => openCheckin();
@@ -864,6 +879,7 @@
     "note-reply": () => go("responder"),
     "note-enter": () => afterNote(),
     "pick-reply": (v) => { state.replyChoice = Number(v); rerender(); },
+    "pick-reply-char": (v) => { state.replyChar = v; rerender(); },
     "reply-send": () => afterNote(),
     "reply-back": () => go("nota"),
 
@@ -874,6 +890,12 @@
       // El tiempo sugerido llega preseleccionado; Sami puede cambiarlo con los chips.
       if (!state.descanso.active && !state.descanso.timeId) state.descanso.timeId = String(D.breakSuggestion.minutes);
       go(state.descanso.active ? "descanso-activo" : "descanso");
+    },
+    // Acceso rápido desde Hoy: llega a Descanso con 2 min preseleccionados (si ya hay uno activo, lo retoma).
+    "descanso-quick": () => {
+      if (state.descanso.active) return go("descanso-activo");
+      state.descanso.timeId = "2";
+      go("descanso");
     },
     "go-yo": () => go("yo"),
     "toggle-challenge": (v) => { state.joinedChallenges[v] = !state.joinedChallenges[v]; rerender(); },

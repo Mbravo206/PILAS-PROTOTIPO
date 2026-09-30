@@ -33,9 +33,13 @@ test("ninguna emoción usa el rojo de error (#CC1400)", () => {
   }
 });
 
-test("el tiempo solo se pregunta con 3 opciones y todas tienen minutos", () => {
-  assert.equal(D.times.length, 3);
-  for (const t of D.times) assert.ok(t.minutes > 0, t.id);
+test("el tiempo se pregunta con 3 tiempos y una opción Indefinido (sin minutos)", () => {
+  const timed = D.times.filter((t) => t.minutes !== null);
+  assert.equal(timed.length, 3);
+  for (const t of timed) assert.ok(t.minutes > 0, t.id);
+  const indef = D.times.filter((t) => t.minutes === null);
+  assert.equal(indef.length, 1);
+  assert.equal(indef[0].label, "Indefinido");
 });
 
 test("Grupo muestra exactamente 2 premiados y hay 2 retos de base", () => {
