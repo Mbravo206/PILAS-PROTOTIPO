@@ -1,0 +1,69 @@
+/* css/styles.css — solo lo que Tailwind no cubre: fuente local, marco de celular, transiciones, a11y */
+
+/* Rubik 400 / 500 / 700 local (sin Google Fonts → abre sin internet) */
+@font-face { font-family: "Rubik"; font-weight: 400; font-display: swap; src: url("../assets/fonts/rubik-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Rubik"; font-weight: 500; font-display: swap; src: url("../assets/fonts/rubik-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Rubik"; font-weight: 700; font-display: swap; src: url("../assets/fonts/rubik-latin-700-normal.woff2") format("woff2"); }
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: "Rubik", system-ui, sans-serif;
+  background: #E9E6F2; /* fondo del escritorio para el pitch */
+  display: grid;
+  place-items: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Marco de celular 390 × 844 para mostrar en computador */
+.phone {
+  position: relative;
+  width: 390px;
+  height: 844px;
+  border-radius: 48px;
+  overflow: hidden;
+  background: #FBF8F1;
+  box-shadow: 0 0 0 10px #1F2240, 0 30px 60px rgba(31, 34, 64, .25);
+  display: flex;
+  flex-direction: column;
+}
+
+/* En celular real: pantalla completa, sin marco */
+@media (max-width: 500px) {
+  body { display: block; background: #FBF8F1; }
+  .phone { width: 100vw; height: 100dvh; border-radius: 0; box-shadow: none; }
+}
+
+/* Pantallas: una visible a la vez */
+.screen { position: absolute; inset: 0; top: 44px; display: flex; flex-direction: column; overflow: hidden; }
+.screen[hidden] { display: none; }
+.screen-body { flex: 1; overflow-y: auto; }
+
+/* Área táctil mínima 44px para elementos más bajos (chips de 40px) */
+.hit-44::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); }
+
+/* Elegir emoción: personaje 0.8 → 1 */
+.pop { display: inline-flex; animation: pop 200ms ease-out; }
+@keyframes pop { from { transform: scale(.8); } to { transform: scale(1); } }
+
+/* Tocar personaje: parpadea una vez */
+.character.blink circle { animation: blink 200ms ease-out; transform-origin: center; transform-box: fill-box; }
+@keyframes blink { 50% { transform: scaleY(.1); } }
+
+/* Hoja inferior: sube en 200ms, fondo ink al 40% */
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(31, 34, 64, .4); opacity: 0; transition: opacity 200ms ease-out; z-index: 20; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; transform: translateY(100%); transition: transform 200ms ease-out; z-index: 21; }
+.sheet-open .sheet-backdrop { opacity: 1; }
+.sheet-open .sheet { transform: translateY(0); }
+
+/* Transición entre pantallas (solo opacidad) */
+.screen.enter { animation: fade 200ms ease-out; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Foco visible para teclado */
+:focus-visible { outline: 3px solid #4C57A9; outline-offset: 2px; }
+
+/* prefers-reduced-motion: el cambio de estado queda, el movimiento se va */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

@@ -1,0 +1,17 @@
+PILAS - Prototipo vertical
+Examen de Seguimiento 2026-2S - Diseno Interactivo UJTL - Grupo 7
+
+COMO ABRIRLO
+1. Doble clic en index.html (Chrome, Edge o Firefox). No necesita internet ni instalar nada.
+2. Modo demo (1 minuto = 5 segundos): tocar 3 veces la barra de estado de arriba,
+   o abrir index.html?demo=1
+3. En celular: abrir el mismo index.html; ocupa toda la pantalla.
+
+QUE PROBAR
+Tocar Instagram o TikTok -> elegir como llegas -> a que vas y cuanto tiempo ->
+esperar el aviso -> salir -> como sales -> inicio.
+"Reiniciar prototipo" en la pantalla de inicio borra los datos.
+
+CREDITOS
+Rubik (SIL OFL 1.1), Lucide (ISC), Tailwind CSS (MIT). Detalle en docs/creditos.md.
+Uso de IA declarado segun escala AIAS en la declaracion del grupo.

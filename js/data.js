@@ -1,0 +1,138 @@
+// js/data.js — contenido del prototipo (emociones, tiempos, alternativas, apps)
+// Las emociones son PROVISIONALES hasta cerrar el diagrama de afinidades.
+window.PILAS_DATA = (function () {
+  const emotions = [
+    { id: "calma",        label: "Calma",        bg: "#6698CC", fill: "#4E7FB3", pause: "Llegas con calma. ¿Para qué entras?" },
+    { id: "alegria",      label: "Alegría",      bg: "#FFEC89", fill: "#F2CF3D", pause: "Llegas con alegría. ¿Para qué entras?" },
+    { id: "ansiedad",     label: "Ansiedad",     bg: "#FFAD33", fill: "#E8901A", pause: "Llegas con ansiedad. ¿Respiras un momento?" },
+    { id: "aburrimiento", label: "Aburrimiento", bg: "#C28CAE", fill: "#A86F93", pause: "Llegas aburrido. ¿Qué buscas?" },
+    // Tristeza: 4.4:1 con ink → su texto va en 18px / 700
+    { id: "tristeza",     label: "Tristeza",     bg: "#967CC7", fill: "#7B61AE", pause: "Llegas con tristeza. ¿Qué necesitas?", bigText: true },
+  ];
+
+  // Tiempo de la pantalla 8. Tres opciones: menos para elegir. "Ahora no" sigue entrando sin tiempo.
+  const times = [
+    { id: "5",  label: "5 min",  minutes: 5 },
+    { id: "10", label: "10 min", minutes: 10 },
+    { id: "15", label: "15 min", minutes: 15 },
+  ];
+
+  // Pantalla 8. PENDIENTE: reemplazar con lo que digan las entrevistas.
+  const alternatives = {
+    aburrimiento: ["Escribirle a alguien", "Poner una canción"],
+    ansiedad: ["Respirar 1 minuto", "Escribir qué te preocupa"],
+    default: ["Escribirle a alguien", "Respirar 1 minuto"],
+  };
+
+  // Home simulado (mínimo): solo las redes con pausa + PILAS. Nunca logos reales.
+  // En producción esta pantalla sería un Accessibility Service (Android) o Screen Time
+  // (iOS): aquí solo se demuestra la intercepción, no reemplaza el celular real.
+  const apps = [
+    { id: "fotogram", name: "Instagram", icon: "aperture", social: true,  color: "#6698CC" },
+    { id: "clipz",    name: "TikTok",   icon: "music",    social: true,  color: "#FFEC89" },
+    { id: "pilas",    name: "PILAS",    icon: null,       social: false, color: "#FBF8F1", isPilas: true },
+  ];
+
+  // Pantalla 13/14: grupo de amigos. El color de cada avatar reutiliza los tokens de emoción
+  // (no es un juicio sobre esa persona, solo el color que le tocó al personaje).
+  const group = [
+    { id: "dani", name: "Dani", emotion: "aburrimiento", timeLabel: "2 h 30 min", weekLabel: "13 h 40 min" },
+    { id: "juan", name: "Juan", emotion: "calma",         timeLabel: "1 h 20 min", weekLabel: "9 h" },
+    { id: "mafe", name: "Mafe", emotion: "alegria",       timeLabel: "40 min",     weekLabel: "5 h 10 min" },
+    { id: "sami", name: "Sami", emotion: "calma",         timeLabel: "25 min",     weekLabel: "6 h 45 min", self: true },
+    { id: "vale", name: "Vale", emotion: "tristeza",      timeLabel: "1 h 5 min",  weekLabel: "7 h 50 min" },
+  ];
+
+  // Retos activos (siempre se muestran exactamente 2): invitaciones del grupo, nunca un bloqueo ni una cuenta regresiva.
+  // "friends" = quiénes ya le entraron (sin contar a Sami, cuya adhesión vive en el estado de la sesión).
+  const challenges = [
+    { id: "nocturno", title: "Nada de redes después de las 11 pm", friends: ["juan", "vale"], selfDefault: true },
+    { id: "descanso", title: "Descanso de estudio sin celular",    friends: ["mafe"],          selfDefault: false },
+  ];
+
+  // "Los premiados de hoy" (Grupo): reconoce sin puntos ni ranking, solo 2 personas.
+  const rewarded = [
+    { id: "juan", note: "Lleva toda la tarde sin abrir redes" },
+    { id: "mafe", note: "Hizo su descanso de estudio completo" },
+  ];
+
+  // PENDIENTE: sugerencias de "Proponer un reto", provisionales hasta validar con el grupo.
+  const challengeSuggestions = ["Nada de redes al despertar", "Una tarde sin celular"];
+
+  // Pantalla 10b: nota de un amigo antes de abrir una red. No ve si entras, cuánto tiempo ni cómo te sientes.
+  const friendNotes = [
+    { id: "n1", from: "vale", message: "¿Salimos a jugar fútbol a las 5?" },
+    { id: "n2", from: "juan", message: "Nosotros dos en el parque. ¿Vamos el sábado?", drawing: true },
+  ];
+
+  // Responder al amigo: respuestas rápidas, sin abrir una bandeja de mensajes.
+  const friendReplies = ["¡Dale!", "Ahora no puedo", "Te cuento después", "Contando con eso"];
+
+  // Dejarle algo a un amigo: mensajes sugeridos además de escribir el propio.
+  const noteSuggestions = ["¿Salimos un rato?", "Te extraño, hablemos", "¿Vemos algo juntos?"];
+
+  // Descanso: tiempos sugeridos y sugerencia según el ritmo de Sami (dato de ejemplo).
+  const breakTimes = [
+    { id: "10", label: "10 min", minutes: 10 },
+    { id: "20", label: "20 min", minutes: 20 },
+    { id: "30", label: "30 min", minutes: 30 },
+  ];
+  const breakSuggestion = { minutes: 20, note: "Este es tu ritmo: sueles descansar 20 min." };
+
+  // "Tus logros" (Descanso): estadísticas simuladas, solo describen. Sin niveles ni comparación.
+  const breakStats = [
+    { label: "Descansos que terminaste", pct: 80 },
+    { label: "Veces que saliste a tiempo", pct: 65 },
+    { label: "Tu meta de foco del mes", pct: 60 },
+  ];
+
+  // 2 descansos de ejemplo para que "Tus descansos" no se vea vacío en el pitch
+  function sampleBreaks() {
+    const today = new Date();
+    const at = (h, m) => { const d = new Date(today); d.setHours(h, m, 0, 0); return d.toISOString(); };
+    return [
+      { id: "d1", minutes: 20, realMinutes: 22, date: at(6, 30) },
+      { id: "d2", minutes: 15, realMinutes: 10, date: at(13, 0) },
+    ];
+  }
+
+  // Pantalla 15 (Yo): metas del mes, elegidas por Sami. Sin niveles ni comparación con nadie más.
+  const goals = [
+    { id: "foco",     title: "30 h de foco en el mes",                    current: 18, target: 30, unit: "h" },
+    { id: "nocturno", title: "Noches sin redes después de las 11 pm",     current: 9,  target: 20, unit: "noches" },
+    { id: "intencion", title: "Entrar con intención",                    current: 14, target: 25, unit: "veces" },
+  ];
+
+  // PENDIENTE: sugerencias de "Agregar meta", provisionales hasta validar con el grupo.
+  const goalSuggestions = ["Comidas sin pantallas", "Salir a caminar sin celular"];
+
+  // "Lo que lograste este mes": describe, no califica. Solo Sami lo ve.
+  const achievements = [
+    { icon: "clock",          text: "Saliste a tiempo 12 veces" },
+    { icon: "moon",           text: "9 noches sin redes tarde" },
+    { icon: "users",          text: "Probaste 2 retos con tu grupo" },
+    { icon: "message-circle", text: "Le escribiste a Vale" },
+  ];
+
+  // Tarjeta protagonista de Yo: horas de foco + comparación de emociones sin juicio (design-system §6).
+  const focus = { current: 18, target: 30, since: "marzo", emoNote: "Llegaste más veces con calma que con ansiedad." };
+
+  // 2 entradas de ejemplo para que la pantalla 13 no se vea vacía en el pitch
+  function sampleEntries() {
+    const today = new Date();
+    const at = (h, m) => { const d = new Date(today); d.setHours(h, m, 0, 0); return d.toISOString(); };
+    return [
+      { id: "demo1", app: "fotogram", emotionIn: "aburrimiento", minutes: 10, realMinutes: 14, emotionOut: "calma", exceeded: true, date: at(7, 15) },
+      { id: "demo2", app: "clipz", emotionIn: "calma", minutes: 5, realMinutes: 4, emotionOut: "alegria", exceeded: false, date: at(12, 40) },
+    ];
+  }
+
+  const byId = (list) => Object.fromEntries(list.map((x) => [x.id, x]));
+
+  return {
+    emotions, times, alternatives, apps, group, challenges, challengeSuggestions, rewarded, breakStats,
+    friendNotes, friendReplies, noteSuggestions, breakTimes, breakSuggestion, sampleBreaks,
+    goals, goalSuggestions, achievements, focus, sampleEntries,
+    EMO: byId(emotions), APP: byId(apps), GROUP: byId(group),
+  };
+})();

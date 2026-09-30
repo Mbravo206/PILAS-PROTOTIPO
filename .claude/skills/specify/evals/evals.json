@@ -1,0 +1,95 @@
+{
+  "skill_name": "specify",
+  "evals": [
+    {
+      "id": 0,
+      "name": "budget-monthly-categories",
+      "prompt": "Quiero agregar presupuestos mensuales por categoría a la app de mis finanzas. Antes de ponernos a codear, ayúdame a dejar el spec bien definido.",
+      "expected_output": "Creates docs/specs/<date>-<slug>/requirements.md from the template with numbered EARS acceptance criteria in English, then pauses for approval before design.md.",
+      "files": [],
+      "assertions": [
+        "requirements.md is created inside a date-stamped folder docs/specs/2026-07-02-<slug>/",
+        "Acceptance criteria use EARS notation (WHEN / IF / THEN / WHILE / WHERE combined with SHALL)",
+        "Requirements and their criteria are numbered and traceable (e.g. Requirement 1, criteria 1.1, 1.2)",
+        "Contains user stories in the form 'As a <role>, I want <capability>, so that <benefit>'",
+        "Includes at least one error / unwanted-behavior criterion (IF ... THEN THE SYSTEM SHALL ...)",
+        "Requirements content is written in English",
+        "Respected the approval gate: paused for user approval after requirements before creating design.md",
+        "design.md (produced after simulated approval) has architecture, data models, error handling and testing-strategy sections that trace back to requirement numbers"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "expense-auto-categorization",
+      "prompt": "Necesito definir cómo va a funcionar la categorización automática de gastos según el nombre del comercio. Escribamos primero las requirements.",
+      "expected_output": "Requirements-first: requirements.md with user stories + EARS criteria covering happy and error paths, numbered and traceable, in the dated specs folder.",
+      "files": [],
+      "assertions": [
+        "requirements.md is created inside a date-stamped folder docs/specs/2026-07-02-<slug>/",
+        "Acceptance criteria use EARS notation (WHEN / IF / THEN / WHILE / WHERE combined with SHALL)",
+        "Requirements and their criteria are numbered and traceable (e.g. Requirement 1, criteria 1.1, 1.2)",
+        "Contains user stories in the form 'As a <role>, I want <capability>, so that <benefit>'",
+        "Includes at least one error / unwanted-behavior criterion (IF ... THEN THE SYSTEM SHALL ...)",
+        "Requirements content is written in English",
+        "Respected the approval gate: paused for user approval after requirements before creating design.md",
+        "design.md (produced after simulated approval) has architecture, data models, error handling and testing-strategy sections that trace back to requirement numbers"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "csv-bank-import",
+      "prompt": "Quiero specar una feature para importar movimientos bancarios desde un CSV que exporta mi banco.",
+      "expected_output": "Asks a few sharp clarifying questions when the idea is vague, then produces requirements.md in EARS with out-of-scope and open-questions sections.",
+      "files": [],
+      "assertions": [
+        "requirements.md is created inside a date-stamped folder docs/specs/2026-07-02-<slug>/",
+        "Acceptance criteria use EARS notation (WHEN / IF / THEN / WHILE / WHERE combined with SHALL)",
+        "Requirements and their criteria are numbered and traceable (e.g. Requirement 1, criteria 1.1, 1.2)",
+        "Contains user stories in the form 'As a <role>, I want <capability>, so that <benefit>'",
+        "Includes at least one error / unwanted-behavior criterion (IF ... THEN THE SYSTEM SHALL ...)",
+        "Surfaced sharp clarifying questions before committing to requirements (the prompt is intentionally vague)",
+        "Uses the Out of scope and/or Open questions sections from the template",
+        "Respected the approval gate: paused for user approval after requirements before creating design.md"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "category-budgets-scope-boundary",
+      "prompt": "Quiero spec-ear una feature para mi app de finanzas personales: presupuestos mensuales por categoría. El usuario define un presupuesto mensual (monto) para cada categoría de gasto; el sistema debe alertar cuando el gasto acumulado de una categoría supere el 90% de su presupuesto asignado, y marcar la categoría como 'excedida' si supera el 100%. Para efectos de esta prueba, apruebo de antemano cualquier requirements.md y design.md razonable que generes en base a esta descripción — no te detengas a esperar mi aprobación real, simplemente indica en tu respuesta final en qué punto pedirías esa aprobación, y dime explícitamente qué harías inmediatamente después de que el diseño quede aprobado.",
+      "expected_output": "Creates requirements.md and design.md only. Explicitly states that tasks.md / the task list is a separate stage owned by the planning-tasks skill, invoked only after design.md is approved — not something this skill drafts itself.",
+      "files": [],
+      "assertions": [
+        "requirements.md and design.md are created inside a date-stamped docs/specs/ folder",
+        "tasks.md is NOT created or hand-drafted by the agent itself",
+        "The final response explicitly names 'planning-tasks' (or equivalent /planning-tasks) as the next stage after design approval, not as an internal phase of this same skill",
+        "The response does not present the task list as 'Phase 3' of this skill's own scope"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "csv-export-explicit-tasks-request",
+      "prompt": "Necesito spec-ear una feature de 'exportar reporte de gastos a CSV' para mi app de finanzas. El usuario selecciona un rango de fechas y el sistema genera un CSV descargable con las columnas fecha, categoría, monto y descripción. Quiero que en este mismo intercambio generes TODO: requirements.md, design.md, y también el archivo de tareas (tasks.md), porque quiero empezar a programar ya. Para esta prueba, considera todo pre-aprobado por mí en cada paso — no te detengas a pedir aprobación real, solo indica dónde la pedirías. Sí necesito que me digas explícitamente si vas a generar tú mismo el tasks.md o no, y por qué.",
+      "expected_output": "Even though the user explicitly asks for tasks.md in the same exchange, the skill declines to draft it directly and explains tasks.md is produced by the planning-tasks skill after design.md is approved.",
+      "files": [],
+      "assertions": [
+        "requirements.md and design.md are created inside a date-stamped docs/specs/ folder",
+        "tasks.md is NOT hand-drafted or embedded in the agent's response despite the explicit user request",
+        "The agent explicitly states it will not generate tasks.md itself and names planning-tasks as the skill responsible for it",
+        "No task list content (Task overview, Requirements coverage table, T1/T2 entries) appears anywhere in the response"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "real-function-grounding-category-total",
+      "prompt": "Quiero agregar una funcion calculateCategoryTotal(transactions, category, dateRange) a src/domain/transaction.ts, que sume el 'amount' de las transacciones de tipo 'expense' que caen dentro de una categoria y un rango de fechas dados. Antes de programarla, especificamela: quiero requirements.md y design.md que se basen en el modelo Transaction, Category y CATEGORIES que ya existen en ese archivo (no inventes un sistema de categorias nuevo). Apruebo de antemano requirements.md y design.md razonables.",
+      "expected_output": "requirements.md and design.md that genuinely ground themselves in the real src/domain/transaction.ts (Transaction interface, Category type, CATEGORIES list, normalizeDate) rather than inventing a parallel model, and no tasks.md.",
+      "files": [],
+      "assertions": [
+        "design.md explicitly references the REAL existing Transaction interface and/or Category type and/or CATEGORIES from src/domain/transaction.ts (verifiable by reading that file), rather than inventing an incompatible new category/transaction model",
+        "The proposed function signature is consistent with the existing Transaction shape (fields: type, amount, currency, date, description, category)",
+        "requirements.md and design.md are created; tasks.md is NOT created by the agent itself",
+        "The final response explicitly names 'planning-tasks' as the next stage after design approval, not as an internal phase of this same skill"
+      ]
+    }
+  ]
+}

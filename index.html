@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>PILAS · Prototipo vertical</title>
+
+  <!-- Estilos offline: Tailwind ya compilado con los tokens PILAS (regenerar con tools/ → npm run build:css) -->
+  <link rel="stylesheet" href="css/tailwind.css" />
+
+  <!-- Desarrollo con internet: Play CDN genera al vuelo las clases nuevas que aún no estén en tailwind.css.
+       Sin internet no carga y no pasa nada: queda tailwind.css. El config va DESPUÉS del CDN. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind.config.js"></script>
+
+  <!-- Iconos: Lucide (copia local, funciona sin internet) -->
+  <script src="js/vendor/lucide.min.js"></script>
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="phone" class="phone text-ink">
+    <!-- Barra de estado simulada. Triple toque = activar/desactivar modo demo -->
+    <header id="statusbar" class="h-11 shrink-0 px-lg flex items-center justify-between text-label text-ink select-none" data-action="statusbar">
+      <span id="clock">9:41</span>
+      <span id="demo-flag" class="text-caption text-ink-soft" hidden>modo demo</span>
+      <span class="inline-flex gap-xs" aria-hidden="true"><i data-lucide="wifi" class="w-4 h-4"></i><i data-lucide="battery-medium" class="w-4 h-4"></i></span>
+    </header>
+
+    <!-- Cada pantalla es una <section>. js/app.js renderiza su contenido y muestra solo la activa. -->
+    <section class="screen" data-screen="inicio"             aria-label="13. Hoy (entrada real de PILAS)"></section>
+    <section class="screen" data-screen="home"               aria-label="0. Celular simulado (demo)" hidden></section>
+    <section class="screen" data-screen="nota"               aria-label="10b. Nota de un amigo" hidden></section>
+    <section class="screen" data-screen="responder"          aria-label="Responder al amigo" hidden></section>
+    <section class="screen" data-screen="alternativa"        aria-label="8. Otra opción" hidden></section>
+    <section class="screen" data-screen="alternativa-hecha"  aria-label="8b. Actividad elegida" hidden></section>
+    <section class="screen" data-screen="entrando"           aria-label="9. Entrando" hidden></section>
+    <section class="screen" data-screen="feed"               aria-label="Feed simulado" hidden></section>
+    <section class="screen" data-screen="pasaste"            aria-label="12. Te pasaste" hidden></section>
+    <section class="screen" data-screen="cierre"             aria-label="11b. Mensaje de cierre" hidden></section>
+    <section class="screen" data-screen="grupo"               aria-label="14. Tu grupo" hidden></section>
+    <section class="screen" data-screen="descanso"           aria-label="Descanso" hidden></section>
+    <section class="screen" data-screen="descanso-activo"    aria-label="Descanso activo" hidden></section>
+    <section class="screen" data-screen="descanso-fin"       aria-label="Descanso fin" hidden></section>
+    <section class="screen" data-screen="dejarmensaje"       aria-label="Dejarle algo a un amigo" hidden></section>
+    <section class="screen" data-screen="yo"                 aria-label="15. Yo" hidden></section>
+
+    <!-- 10. Aviso de intención: hoja inferior sobre el feed -->
+    <div id="sheet-layer" class="absolute inset-0 z-20" hidden>
+      <div class="sheet-backdrop" data-action="sheet-more"></div>
+      <div class="sheet bg-surface rounded-t-sheet px-lg pt-lg pb-xl" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
