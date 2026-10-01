@@ -79,12 +79,13 @@ window.UI = (function () {
   // Elegida: borde ink + personaje que "salta". compact = fila de 64px (hojas inferiores).
   function emotionCard(e, selected, action, { compact = false } = {}) {
     const ring = selected ? "border-ink" : "border-transparent";
-    const text = e.bigText ? "text-[18px] leading-6 font-bold" : "text-body font-medium"; // tristeza: 4.4:1 → 18px/700
-    const layout = compact ? "min-h-[64px] flex-row items-center gap-sm" : "min-h-[112px] flex-col items-start justify-between";
-    return `<button type="button" class="emotion-card w-full rounded-card border-2 ${ring} p-md flex ${layout} text-left text-ink transition duration-200 ease-out active:scale-[0.98]"
+    // Compacta (hojas, 2 columnas de ~164px): texto de 14px y menos relleno para que "Aburrimiento" quepa.
+    const text = e.bigText ? "text-[18px] leading-6 font-bold" : compact ? "text-label" : "text-body font-medium";
+    const layout = compact ? "min-h-[64px] flex-row items-center gap-sm p-sm" : "min-h-[112px] flex-col items-start justify-between p-md";
+    return `<button type="button" class="emotion-card w-full rounded-card border-2 ${ring} flex ${layout} text-left text-ink transition duration-200 ease-out active:scale-[0.98]"
       style="background:${e.bg}" aria-pressed="${selected}" ${attrs(action, e.id)}>
-      <span class="${selected ? "pop" : ""} inline-flex items-center justify-center rounded-full bg-surface shrink-0 ${compact ? "w-11 h-11" : "w-12 h-12"}">${character(e.id, compact ? 32 : 36)}</span>
-      <span class="${text}">${e.label}</span></button>`;
+      <span class="${selected ? "pop" : ""} inline-flex items-center justify-center rounded-full bg-surface shrink-0 ${compact ? "w-10 h-10" : "w-12 h-12"}">${character(e.id, compact ? 30 : 36)}</span>
+      <span class="${text} min-w-0">${e.label}</span></button>`;
   }
 
   // Punto de emoción para listas

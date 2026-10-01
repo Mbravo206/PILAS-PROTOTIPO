@@ -222,11 +222,11 @@
       });
     },
 
-    // 8. Otra opción + tiempo — alternativas con el MISMO peso que "Igual quiero entrar".
+    // 8. Otra opción + tiempo — las alternativas son botones oscuros; "Igual quiero entrar" es texto plano, siempre visible.
     // Aquí vive la única pregunta de tiempo; llega preseleccionado (ver goAlternativa).
     alternativa() {
       const e = D.EMO[state.emotionIn];
-      const opts = alternativesFor().map((a, i) => button(a, { variant: "secondary", action: "pick-alt", value: i })).join("");
+      const opts = alternativesFor().map((a, i) => button(a, { action: "pick-alt", value: i })).join("");
       const times = D.times.map((t) => chip(t.label, { action: "pick-time", value: t.id, selected: state.timeId === t.id })).join("");
       return screen({
         title: "¿Y si pruebas otra cosa primero?",
@@ -235,7 +235,7 @@
           <div class="flex justify-center py-md">${avatar(state.emotionIn, 96)}</div>
           <h2 class="text-title-md text-ink mt-lg">¿Cuánto tiempo piensas usar la app?</h2>
           <div class="flex flex-wrap gap-sm mt-md">${times}</div>`,
-        actions: opts + button("Igual quiero entrar", { variant: "secondary", action: "alt-enter" }),
+        actions: opts + textButton("Igual quiero entrar", { action: "alt-enter" }),
       });
     },
 

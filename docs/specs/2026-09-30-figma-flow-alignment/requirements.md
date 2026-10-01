@@ -194,8 +194,9 @@ question, so that pausing before I enter never feels like a form.
 6.4. WHEN the user taps "Seguir" THE SYSTEM SHALL show "¿Y si pruebas otra
      cosa primero?" with at most 2 alternatives, the only time question
      ("¿Cuánto tiempo piensas usar la app?": 5, 10 or 15 min, or "Indefinido",
-     preselected from the last timed entry or 10 min) and an "Igual quiero
-     entrar" action weighted like the alternatives.
+     preselected from the last timed entry or 10 min), the alternatives as
+     prominent filled actions and "Igual quiero entrar" as plain text (no fill,
+     border or rounding), still visible with a touch area of at least 44px.
 6.5. WHEN the user taps "Ahora no" THE SYSTEM SHALL go straight into the
      social app; entry is never blocked.
 6.6. WHERE the setting "Pausa antes de abrir redes" is off THE SYSTEM SHALL

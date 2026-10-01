@@ -169,9 +169,10 @@ openInterstitial(kind: "descanso" | "reto", challenge?: Challenge): void
 - **Responsibility:** asks "¿Cuánto tiempo piensas usar la app?". Preselects
   the time from `mostRecentEntry()?.minutes` mapped through `timeIdForMinutes`
   (a `null` minutes maps to no id, so "Indefinido" is never preselected), else
-  `"10"`. Shows at most 2 alternatives (`alternativesFor()`), the chips from
-  `D.times` (5 / 10 / 15 min and "Indefinido" with `minutes: null`) and "Igual
-  quiero entrar" weighted like the alternatives.
+  `"10"`. Shows at most 2 alternatives (`alternativesFor()`) as filled `button`s,
+  the chips from `D.times` (5 / 10 / 15 min and "Indefinido" with `minutes:
+  null`) and "Igual quiero entrar" as `UI.textButton` (same pattern as the
+  interstitial).
 - **Indefinido (6.7):** `state.minutes = null`, so `onEnter.feed` does not call
   `schedule(...)` and no time sheet ever opens; `renderers.entrando` already
   omits the minutes when `minutes` is null.
@@ -414,8 +415,8 @@ checks (`MANUAL` in `task-verifier`), then replayed by `test-plan.md`.
     near `renderers.home` (2.5).
   - Source check: boot line is `go("home")` (1.1).
   - Source check: in `openInterstitial` and `renderers.nota`, "Entrar igual" is
-    rendered with `textButton` and the other action with a primary `button`
-    (3.1, 3.2, 4.7).
+    rendered with `textButton` and the other action with a primary `button`;
+    same for "Igual quiero entrar" in `renderers.alternativa` (3.1, 3.2, 4.7, 6.4).
 - **Edge cases (manual):**
   - Break + joined challenge → one sheet only (3.3).
   - Backdrop tap on each sheet does not block entry and has a visible
