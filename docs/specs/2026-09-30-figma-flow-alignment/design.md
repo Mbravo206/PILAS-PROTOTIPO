@@ -522,3 +522,10 @@ checks (`MANUAL` in `task-verifier`), then replayed by `test-plan.md`.
   PILAS card replaces the character after a long stay — **Rationale:** the
   closing screen should not feel the same every time, and PILAS speaks
   without blaming — **Alternative considered:** one fixed message; rejected.
+- **Decision:** Every action that goes to the simulated phone ("Volver al inicio" on
+  "Hoy", "Ir al celular" on "Descanso activo", "Volver al celular" after an
+  alternative) uses the `phone` button variant: yellow (`bg-emo-alegria`) with a
+  phone icon — **Rationale:** people did not understand that these buttons return
+  to the demo's start; a color of their own, different from the primary blue,
+  makes them recognizable — **Alternative considered:** keep secondary/tonal
+  styles; rejected because they looked like any other action.

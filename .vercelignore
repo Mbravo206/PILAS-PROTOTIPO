@@ -1,0 +1,7 @@
+# Solo se publica el prototipo (index.html, css, js, assets). Docs, diseños y herramientas no.
+.claude
+docs
+IMAGENES FIGMA
+tools
+*.md
+LEEME.txt

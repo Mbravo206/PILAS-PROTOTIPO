@@ -260,7 +260,7 @@
             <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-xl">${alternativesFor()[state.alt] || "Buena elección"}</h1>
             <p class="text-body text-ink-soft mt-sm">Cuando quieras, vuelves a tu celular.</p>
           </div>
-          <div class="pb-xl w-full">${button("Volver al celular", { action: "open-home-demo" })}</div>
+          <div class="pb-xl w-full">${button("Volver al celular", { variant: "phone", icon: "smartphone", action: "open-home-demo" })}</div>
         </div>`;
     },
 
@@ -370,7 +370,7 @@
             </div>
 
             <div class="flex flex-col gap-sm mt-xl mb-lg">
-              ${button("Volver al inicio", { variant: "secondary", action: "open-home-demo" })}
+              ${button("Volver al inicio", { variant: "phone", icon: "smartphone", action: "open-home-demo" })}
               ${button("Reiniciar prototipo", { variant: "tonal", action: "reset-all" })}
             </div>
           </div>
@@ -446,7 +446,7 @@
             <p class="text-body text-ink mt-sm">No pasa nada si sales antes.</p>
           </div>
           <div class="pb-xl flex flex-col gap-sm w-full">
-            ${button("Ir al celular", { variant: "tonal", action: "descanso-go-home" })}
+            ${button("Ir al celular", { variant: "phone", icon: "smartphone", action: "descanso-go-home" })}
             ${button("Salir antes", { variant: "tonal", action: "descanso-end" })}
           </div>
         </div>`;

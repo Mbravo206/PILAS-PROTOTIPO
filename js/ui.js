@@ -7,6 +7,7 @@ window.UI = (function () {
 
   // Botón · 4 variantes. Alto 52px, pill, label 14/500. Una primaria por pantalla.
   // Secundario y tonal llevan fondo blanco: sobre el color de una emoción no se pierden.
+  // "phone" = vuelve al celular simulado (amarillo + ícono de celular).
   // "active" = estado ya activado (p. ej. "Estás en el reto"): verde de intención + check.
   function button(label, { variant = "primary", action, value, disabled = false, full = true, icon = null, pressed = null } = {}) {
     const base =
@@ -19,6 +20,8 @@ window.UI = (function () {
       secondary: "bg-surface border-2 border-primary text-ink active:bg-line",
       tonal: "bg-surface border-2 border-primary/30 text-ink active:bg-line",
       active: "bg-state-intencion border-2 border-ink/20 text-ink active:brightness-95",
+      // "phone" = lleva al celular simulado (el inicio de la demo): amarillo, distinto al azul de las demás acciones.
+      phone: "bg-emo-alegria border-2 border-ink/20 text-ink active:brightness-95",
     };
     const ic = icon ? `<i data-lucide="${icon}" class="w-5 h-5 mr-sm pop" stroke-width="2" aria-hidden="true"></i>` : "";
     const pr = pressed == null ? "" : `aria-pressed="${pressed}"`;
