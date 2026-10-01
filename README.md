@@ -38,4 +38,4 @@ npm run build:css  # regenera css/tailwind.css
 - `GUIA.md` — flujo de trabajo con Claude Code (spec-driven) y qué se guarda dónde
 - `CLAUDE.md` — stack, comandos de verificación y reglas para Claude Code
 - `docs/creditos.md` — licencias de assets
-- `docs/figma/` — PNG exportados de Figma, uno por pantalla
+- `docs/figma/` — PNG exportados de Figma, uno por pantalla (solo en el computador de quien los exporta; no se suben a GitHub)

@@ -54,7 +54,7 @@ declara su verificación manual en `tasks.md` y `task-verifier` la reporta como
 `index.html` → `renderers.x = () => screen({ title, body, actions })` → acciones
 en `actions` → si hay clases nuevas, build de CSS.
 
-**Aplicar un diseño de Figma:** el PNG va en `docs/figma/NN-nombre.png`. Ajusta
+**Aplicar un diseño de Figma:** el PNG va en `docs/figma/NN-nombre.png` (carpeta solo local: no se sube a GitHub). Ajusta
 solo esa pantalla, con tokens y componentes existentes; si Figma trae un color
 o tamaño que no está en los tokens, pregunta antes de inventarlo.
 

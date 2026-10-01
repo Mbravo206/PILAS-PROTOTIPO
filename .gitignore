@@ -8,3 +8,7 @@ Thumbs.db
 .vercel
 
 .vercel
+
+# Capturas de Figma: solo locales
+IMAGENES FIGMA/
+docs/figma/*.png

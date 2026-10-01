@@ -90,7 +90,7 @@ Todo spec de feature hereda estos criterios.
 | Diagrama de afinidades | Nicol | Emociones finales (check-in y salida) |
 | Entrevistas | Nicol, Polo | Alternativas de "¿Y si pruebas otra cosa primero?" |
 | Wireframes en papel | Daniela, Shara | Layout de cada pantalla |
-| Pantallas en Figma / guía de estilos | Shara, Daniela, Mariana | G4 (exportar PNG a `docs/figma/`) |
+| Pantallas en Figma / guía de estilos | Shara, Daniela, Mariana | G4 (exportar PNG a `docs/figma/`, solo local) |
 | Tema principal / sonido | Shara | Feedback sonoro (opcional) |
 
 ## 9. Hitos

@@ -11,7 +11,7 @@ pierde** al cerrar la sesión con Claude Code.
 | Detalle técnico y decisiones provisionales | `docs/spec.md` | A mano o pidiéndoselo a Claude |
 | Tokens, componentes, voz | `docs/design-system.md` + `js/tailwind.config.js` | Cambiar los dos juntos |
 | Stack y comandos de verificación | `CLAUDE.md` | Ya están llenos |
-| Pantallas de Figma | `docs/figma/NN-nombre.png` | Export PNG 1x desde Figma |
+| Pantallas de Figma | `docs/figma/NN-nombre.png` (solo local, no se sube a GitHub) | Export PNG 1x desde Figma |
 | Qué debe hacer la tarea (criterios) | `docs/specs/<fecha>-<tarea>/requirements.md` | `/specify` |
 | Cómo se construye | `design.md` (misma carpeta) | `/specify`, después de aprobar requirements |
 | Plan, avance y **decisiones** | `tasks.md` (Status + Decision log + Outcome) | `/planning-tasks` y se actualiza al trabajar |
