@@ -381,7 +381,7 @@
           <div class="screen-body px-lg pt-lg">
             <h1 tabindex="-1" class="text-title-lg text-ink outline-none">Tu grupo</h1>
             <p class="text-body text-ink-soft mt-xs">Los del colegio</p>
-            <ul class="mt-lg bg-surface rounded-card border border-line px-md">${groupRows(D.group)}</ul>
+            <ul class="mt-lg flex flex-col gap-sm">${groupRows(D.group)}</ul>
             <p class="text-caption text-ink-soft mt-sm">Aquí solo ves quién está en el reto. Tu tiempo lo ves solo tú.</p>
 
             <h2 class="text-title-md text-ink mt-xl">Los premiados de hoy</h2>
@@ -607,9 +607,9 @@
     return `
       <div class="flex items-center justify-between">
         <h2 class="text-title-md text-ink">Tu grupo</h2>
-        <button type="button" class="hit-44 relative text-label text-primary transition duration-200 ease-out active:text-primary-pressed" data-action="go-grupo">Los del colegio</button>
+        <button type="button" class="hit-44 relative inline-flex items-center gap-xs text-label text-ink transition duration-200 ease-out active:opacity-70" data-action="go-grupo">Ver grupo<i data-lucide="chevron-right" class="w-4 h-4" stroke-width="2" aria-hidden="true"></i></button>
       </div>
-      <ul class="mt-sm bg-surface rounded-card border border-line px-md">${groupRows(D.group.slice(0, 4))}</ul>`;
+      <ul class="mt-sm flex flex-col gap-sm">${groupRows(D.group.slice(0, 4))}</ul>`;
   }
 
   // Estado de cada persona frente a los retos: "cumplio" | "enCurso" | null. Sin puntos ni ranking.
@@ -628,18 +628,24 @@
       ${done ? `<i data-lucide="check" class="w-4 h-4" stroke-width="2" aria-hidden="true"></i>` : ""}${done ? "Cumplió" : "En curso"}</span>`;
   }
 
-  // Filas de "Tu grupo": solo si cada quien está en el reto o lo cumplió, sin tiempos de los demás.
+  // Filas de "Tu grupo": estilo ranking pero sin ranking (sin números, sin orden, sin puntos).
+  // La carita al frente solo describe el estado del reto; los tiempos ajenos nunca se muestran.
   // El tiempo propio es opcional y privado: solo aparece en la fila de Sami si comparte el ajuste.
   function groupRows(members) {
-    return members.map((m) => `
-      <li class="min-h-[56px] flex items-center gap-md py-sm border-b border-line last:border-0">
+    return members.map((m) => {
+      const status = retoStatus(m);
+      const face = status === "cumplio" ? "laugh" : "smile";
+      return `
+      <li class="min-h-[64px] flex items-center gap-md px-md py-sm rounded-input ${m.self ? "bg-primary/20" : "bg-surface border border-line"}">
+        <i data-lucide="${face}" class="w-6 h-6 shrink-0 ${status ? "text-ink" : "text-ink-soft"}" stroke-width="1.5" aria-hidden="true"></i>
         ${personAvatar(m, 36)}
         <span class="flex-1">
           <span class="block text-label text-ink">${m.name}${m.self ? ` <span class="text-caption text-ink-soft">Tú</span>` : ""}</span>
           ${m.self && state.settings.shareTime ? `<span class="block text-caption text-ink-soft">Hoy ${m.timeLabel} · solo tú lo ves</span>` : ""}
         </span>
-        ${retoChip(retoStatus(m))}
-      </li>`).join("");
+        ${retoChip(status)}
+      </li>`;
+    }).join("");
   }
 
   // Retos activos: cada uno con su propia adhesión
@@ -687,16 +693,16 @@
     const rows = D.rewarded.map((r) => {
       const m = D.GROUP[r.id];
       return `
-        <li class="min-h-[64px] flex items-center gap-md py-sm border-b border-line last:border-0">
+        <li class="min-h-[64px] flex items-center gap-md p-sm bg-surface rounded-input border border-line">
           ${personAvatar(m, 40)}
           <span class="flex-1">
             <span class="block text-label text-ink">${m.name}</span>
             <span class="block text-caption text-ink-soft">${r.note}</span>
           </span>
-          <i data-lucide="sparkles" class="w-5 h-5 text-primary shrink-0" stroke-width="1.5" aria-hidden="true"></i>
+          <i data-lucide="party-popper" class="w-6 h-6 text-ink-soft shrink-0" stroke-width="1.5" aria-hidden="true"></i>
         </li>`;
     }).join("");
-    return `<ul class="bg-surface rounded-card border border-line px-md">${rows}</ul>
+    return `<ul class="bg-primary/20 rounded-card p-sm flex flex-col gap-sm">${rows}</ul>
       <p class="text-caption text-ink-soft mt-sm">Sin puntos ni ranking: es solo para celebrarlos.</p>`;
   }
 
