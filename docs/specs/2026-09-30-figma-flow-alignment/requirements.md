@@ -132,8 +132,10 @@ full conversation that delays or blocks me from entering.
      pensaré", "Ahorita no puedo", "Te cuento luego", each a character with a
      face) and two actions: "Enviar" and "Volver".
 4.2. WHEN the user selects a reply and taps "Enviar" THE SYSTEM SHALL
-     record that the reply was sent and continue into the check-in flow
-     (same destination `nota`'s "Entrar igual" goes to today).
+     record that the reply was sent and return to the `nota` screen of the
+     same note, now showing a confirmation of what was sent and a single
+     primary action "Entrar a <app>"; the check-in only starts when the user
+     activates that action.
 4.3. WHEN the user taps "Volver" THE SYSTEM SHALL return to the `nota`
      screen with the same note still shown.
 4.4. IF neither a phrase nor a reply character is selected THEN THE SYSTEM
@@ -194,9 +196,10 @@ question, so that pausing before I enter never feels like a form.
 6.4. WHEN the user taps "Seguir" THE SYSTEM SHALL show "¿Y si pruebas otra
      cosa primero?" with at most 2 alternatives, the only time question
      ("¿Cuánto tiempo piensas usar la app?": 5, 10 or 15 min, or "Indefinido",
-     preselected from the last timed entry or 10 min), the alternatives as
-     prominent filled actions and "Igual quiero entrar" as plain text (no fill,
-     border or rounding), still visible with a touch area of at least 44px.
+     preselected from the last timed entry or 10 min), the two alternatives as
+     two square tiles side by side with a soft fill (not a primary button) and,
+     below them, "Igual quiero entrar" as plain text (no fill, border or
+     rounding), still visible with a touch area of at least 44px.
 6.5. WHEN the user taps "Ahora no" THE SYSTEM SHALL go straight into the
      social app; entry is never blocked.
 6.6. WHERE the setting "Pausa antes de abrir redes" is off THE SYSTEM SHALL
@@ -216,13 +219,20 @@ colorful check, so that leaving stays as easy as the rest of the flow.
      después?" as a bottom sheet over the feed, with one colored card for
      each of the four emotions and a visible "Saltar".
 7.2. WHEN the user picks an emotion THE SYSTEM SHALL save the entry, show the
-     closing message for 1.5 seconds, and then return to the simulated phone
+     closing message for 3 seconds, and then return to the simulated phone
      home without a manual tap.
 7.3. WHEN the user taps "Saltar" THE SYSTEM SHALL save the entry without an
      exit emotion and follow the same automatic close.
-7.4. THE SYSTEM SHALL show "Es tu decisión, sigue así." with a short
-     motivational line when the user stayed within the chosen time, and "Listo.
-     Mañana es otro día." when they went over (`state.exceeded`).
+7.4. THE SYSTEM SHALL show a closing message and a background color that depend
+     on the emotion chosen on exit: for Calma and Alegría "Cuando te pones las
+     pilas, tienes el control."; for Ansiedad and Aburrimiento "Tranqui, tú
+     tienes el control." with "Busca algo que te anime."; when the exit emotion
+     was skipped, "Es tu decisión, sigue así.". The background is that emotion's
+     color.
+7.5. WHEN the user went over the chosen time (`state.exceeded`) or stayed 20
+     minutes or more THE SYSTEM SHALL show, instead of the character, a PILAS
+     card with the PILAS icon and "PILAS: llevas un buen rato en redes. Un
+     descanso te puede caer bien.", without judgment, penalty or a countdown.
 
 ### Requirement 8 — Real "Dejarle algo a un amigo" composer, entered from "Hoy"
 

@@ -24,12 +24,17 @@ window.PILAS_DATA = (function () {
     default: ["Escribirle a alguien", "Respirar 1 minuto"],
   };
 
-  // Home simulado (mínimo): solo las redes con pausa + PILAS. Nunca logos reales.
+  // Home simulado (mínimo): solo las redes con pausa + PILAS. Íconos genéricos, nunca logos reales.
+  // La lista de Yo → "Redes con pausa" sale de aquí: todas empiezan con la pausa encendida.
   // En producción esta pantalla sería un Accessibility Service (Android) o Screen Time
   // (iOS): aquí solo se demuestra la intercepción, no reemplaza el celular real.
   const apps = [
     { id: "fotogram", name: "Instagram", icon: "aperture", social: true,  color: "#6698CC" },
     { id: "clipz",    name: "TikTok",   icon: "music",    social: true,  color: "#FFEC89" },
+    { id: "youtube",  name: "YouTube",  icon: "youtube",  social: true,  color: "#FFAD33" },
+    { id: "snap",     name: "Snapchat", icon: "ghost",    social: true,  color: "#C28CAE" },
+    { id: "equis",    name: "X",        icon: "at-sign",  social: true,  color: "#967CC7" },
+    { id: "facebook", name: "Facebook", icon: "facebook", social: true,  color: "#6698CC" },
     { id: "pilas",    name: "PILAS",    icon: null,       social: false, color: "#FBF8F1", isPilas: true },
   ];
 
@@ -64,13 +69,13 @@ window.PILAS_DATA = (function () {
 
   // Pantalla 10b: nota de un amigo antes de abrir una red. No ve si entras, cuánto tiempo ni cómo te sientes.
   const friendNotes = [
-    { id: "n1", from: "vale", message: "¿Salimos a jugar fútbol a las 5?" },
-    { id: "n2", from: "juan", message: "Nosotros dos en el parque. ¿Vamos el sábado?", drawing: true },
+    { id: "n1", from: "vale", message: "Ey ey, ¡pilas con el cel!" },
+    { id: "n2", from: "juan", message: "Te dibujé esto, no te rías.", drawing: true },
     { id: "n3", from: "mafe", message: "Te mandé esta flor para que te concentres.", gift: "flor" },
   ];
 
   // Responder al amigo: respuestas rápidas, sin abrir una bandeja de mensajes.
-  const friendReplies = ["¡Dale!", "¡Gracias!", "Contando con eso"];
+  const friendReplies = ["¡Dale!", "¡Gracias!", "Jaja, listo"];
 
   // Responder al amigo con un muñequito: una respuesta sin palabras. `face` es la carita (id de emoción) que se dibuja.
   const replyDolls = [
@@ -81,7 +86,7 @@ window.PILAS_DATA = (function () {
   ];
 
   // Dejarle algo a un amigo: mensajes sugeridos además de escribir el propio.
-  const noteSuggestions = ["¿Salimos un rato?", "Te extraño, hablemos", "¿Vemos algo juntos?"];
+  const noteSuggestions = ["Ey ey, ¡pilas con el cel!", "¿Cómo vas hoy?", "Acuérdate de tomar agua"];
 
   // Descanso: tiempos sugeridos y sugerencia según el ritmo de Sami (dato de ejemplo).
   const breakTimes = [

@@ -40,7 +40,8 @@
     saved: false,     // evita guardar dos veces la misma sesión
     currentNote: null, // pantalla 10b: nota de amigo pendiente de mostrar
     replyChoice: null, // respuesta rápida elegida al responder al amigo
-    replyChar: null,   // muñequito (emoción) elegido al responder al amigo
+    replyChar: null,   // muñequito elegido al responder al amigo
+    replySent: false,  // ya le respondió a la nota actual (la nota se muestra con confirmación)
     ...initialProfile(),
   };
 
@@ -140,6 +141,9 @@
       </div>`;
   }
 
+  // Texto de lo que Sami le respondió al amigo (frase y/o muñequito)
+  const sentReplyText = () => [D.friendReplies[state.replyChoice], D.replyDolls.find((d) => d.id === state.replyChar)?.label].filter(Boolean).join(" · ");
+
   // ---------- Pantallas ----------
   const renderers = {
     // 0. Celular simulado (mínimo) — solo demuestra la intercepción al abrir una red.
@@ -184,10 +188,12 @@
           <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-md">${n.message}</h1>
           ${n.drawing ? `<div class="bg-surface rounded-card border border-line p-md mt-lg mx-auto"><p class="text-caption text-ink-soft">Te mandó un dibujo</p></div>` : ""}
           ${n.gift === "flor" ? `<div class="bg-surface rounded-card border border-line p-md mt-lg mx-auto flex flex-col items-center gap-xs">${flower(96)}<p class="text-caption text-ink-soft">${friend.name} te mandó una flor</p></div>` : ""}
+          ${state.replySent ? `<p class="text-label text-ink mt-lg">Le respondiste a ${friend.name}: ${sentReplyText()}.</p>` : ""}
           <p class="text-label text-ink-soft mt-lg">${friend.name} no ve si entras, cuánto tiempo ni cómo te sientes.</p>
           <div class="mt-auto pb-xl flex flex-col gap-sm">
-            ${button("Responderle", { action: "note-reply" })}
-            ${textButton("Entrar igual", { action: "note-enter" })}
+            ${state.replySent
+              ? button(`Entrar a ${D.APP[state.app]?.name || "la red"}`, { action: "note-enter" })
+              : button("Responderle", { action: "note-reply" }) + textButton("Entrar igual", { action: "note-enter" })}
           </div>
         </div>`;
     },
@@ -222,11 +228,15 @@
       });
     },
 
-    // 8. Otra opción + tiempo — las alternativas son botones oscuros; "Igual quiero entrar" es texto plano, siempre visible.
+    // 8. Otra opción + tiempo — las alternativas son dos fichas cuadradas suaves; "Igual quiero entrar" es texto plano debajo, siempre visible.
     // Aquí vive la única pregunta de tiempo; llega preseleccionado (ver goAlternativa).
     alternativa() {
       const e = D.EMO[state.emotionIn];
-      const opts = alternativesFor().map((a, i) => button(a, { action: "pick-alt", value: i })).join("");
+      // Dos fichas cuadradas, una al lado de la otra: tono suave (blanco translúcido), para no competir con el botón oscuro de otras pantallas.
+      const opts = `<p class="text-label text-ink">Prueba una de estas</p>
+        <div class="grid grid-cols-2 gap-sm">${alternativesFor().map((a, i) => `
+          <button type="button" class="aspect-square rounded-card border-2 border-primary bg-white/60 text-ink text-label text-center p-md flex items-center justify-center transition duration-200 ease-out active:scale-[0.98] active:bg-white/80"
+            data-action="pick-alt" data-value="${i}">${a}</button>`).join("")}</div>`;
       const times = D.times.map((t) => chip(t.label, { action: "pick-time", value: t.id, selected: state.timeId === t.id })).join("");
       return screen({
         title: "¿Y si pruebas otra cosa primero?",
@@ -293,16 +303,25 @@
       });
     },
 
-    // 11b. Mensaje de cierre — 1.5s y vuelve sola al celular (ver onEnter.cierre)
+    // 11b. Mensaje de cierre — 3 s y vuelve sola al celular (ver onEnter.cierre).
+    // El mensaje y el color cambian con la emoción de salida; si llevas rato en redes habla PILAS.
     cierre() {
-      const { msg, sub } = state.exceeded
-        ? { msg: "Listo. Mañana es otro día.", sub: "Lo importante es que lo notaste." }
-        : { msg: "Es tu decisión, sigue así.", sub: "Elegir con calma también es avanzar." };
-      return screen({
-        title: msg,
-        subtitle: sub,
-        body: `<div class="flex justify-center py-lg">${character(state.emotionOut || state.emotionIn, 120)}</div>`,
-      });
+      const out = state.emotionOut;
+      const msgs = {
+        calma:        { msg: "Cuando te pones las pilas, tienes el control.", sub: "Sigue así, con calma." },
+        alegria:      { msg: "Cuando te pones las pilas, tienes el control.", sub: "Qué bueno que salgas con alegría." },
+        ansiedad:     { msg: "Tranqui, tú tienes el control.", sub: "Busca algo que te anime." },
+        aburrimiento: { msg: "Tranqui, tú tienes el control.", sub: "Busca algo que te anime." },
+      };
+      const { msg, sub } = msgs[out] || { msg: "Es tu decisión, sigue así.", sub: "Elegir con calma también es avanzar." };
+      const long = state.exceeded || realMinutes() >= 20; // "ya llevas bastante en redes"
+      const body = long
+        ? `<div class="bg-surface rounded-card border border-line p-md flex items-center gap-md">
+             <span class="inline-block shrink-0 w-14 h-14">${pilasIcon(56)}</span>
+             <p class="text-body text-ink">PILAS: llevas un buen rato en redes. Un descanso te puede caer bien.</p></div>`
+        : `<div class="flex justify-center py-lg">${avatar(out || state.emotionIn, 140)}</div>`;
+      // Todo el texto en ink (sobre el color de la emoción): el apoyo va en el cuerpo, no como subtítulo gris.
+      return screen({ title: msg, body: `<p class="text-body text-ink -mt-md mb-md">${sub}</p>${body}`, bg: (D.EMO[out] || D.EMO.alegria).bg });
     },
 
     // 13. Inicio — el día sin puntaje (sin totales, sin rachas)
@@ -677,9 +696,11 @@
     ];
     const tabs = items.map(([label, icon, action, id]) => {
       const current = id === active;
-      return `<button type="button" class="flex-1 h-14 flex flex-col items-center justify-center gap-xs text-caption transition duration-200 ease-out active:scale-[0.94] active:bg-line/40 ${current ? "text-ink" : "text-ink-soft"}"
+      // La pestaña actual se nota: píldora de primary con baja opacidad detrás del ícono, ícono más grueso y etiqueta en negrita.
+      return `<button type="button" class="flex-1 h-14 flex flex-col items-center justify-center gap-xs text-caption transition duration-200 ease-out active:scale-[0.94] ${current ? "text-ink font-bold" : "text-ink-soft"}"
         data-action="${action}" ${current ? 'aria-current="page"' : ""}>
-        <i data-lucide="${icon}" class="w-6 h-6" stroke-width="1.5"></i>${label}</button>`;
+        <span class="inline-flex items-center justify-center w-14 h-7 rounded-full transition duration-200 ease-out ${current ? "bg-primary/20" : ""}">
+          <i data-lucide="${icon}" class="w-6 h-6" stroke-width="${current ? 2 : 1.5}"></i></span>${label}</button>`;
     }).join("");
     return `<nav class="flex border-t border-line bg-surface pb-sm" aria-label="Navegación principal">${tabs}</nav>`;
   }
@@ -699,7 +720,7 @@
         if (state.minutes) schedule(state.minutes, openSheet); // aviso al cumplirse el tiempo
       }
     },
-    cierre() { clearTimer(); timer = setTimeout(() => go("home"), 1500); },
+    cierre() { clearTimer(); timer = setTimeout(() => go("home"), 3000); },
     "descanso-activo"() {
       // Recalcula lo que falta: volver a esta pantalla (p. ej. desde el nav) no debe alargar el descanso.
       const elapsedMinutes = (Date.now() - state.descanso.startedAt) / minuteMs();
@@ -776,7 +797,7 @@
 
   // Sigue el flujo normal de abrir una red: nota de un amigo (si hay) y luego el check-in.
   function continueOpenApp() {
-    if (state.noteQueue.length) { state.currentNote = state.noteQueue.shift(); state.replyChoice = null; state.replyChar = null; go("nota"); return; }
+    if (state.noteQueue.length) { state.currentNote = state.noteQueue.shift(); state.replyChoice = null; state.replyChar = null; state.replySent = false; go("nota"); return; }
     afterNote();
   }
   const afterNote = () => openCheckin();
@@ -880,7 +901,7 @@
     "note-enter": () => afterNote(),
     "pick-reply": (v) => { state.replyChoice = Number(v); rerender(); },
     "pick-reply-char": (v) => { state.replyChar = v; rerender(); },
-    "reply-send": () => afterNote(),
+    "reply-send": () => { state.replySent = true; go("nota"); }, // vuelve a la nota; de ahí entra cuando quiera
     "reply-back": () => go("nota"),
 
     "open-pilas": () => go("inicio"),

@@ -149,7 +149,7 @@ openInterstitial(kind: "descanso" | "reto", challenge?: Challenge): void
   (4.4).
 - **Interface:** `note-reply` → `go("responder")`; `pick-reply(i)` sets
   `state.replyChoice` and `pick-reply-char(id)` sets `state.replyChar`, both
-  calling `rerender()`; `continueOpenApp` resets both per note; `reply-send` → `afterNote()`;
+  calling `rerender()`; `continueOpenApp` resets both per note; `reply-send` sets `state.replySent = true` and returns to `nota`, which then shows what was sent and a single "Entrar a <app>" action (`continueOpenApp` resets `replySent`);
   `reply-back` → `go("nota")` (same `currentNote`); `note-enter` →
   `afterNote()` and never touches `responder` (4.5).
 - **Depends on:** `UI.chip`, `UI.button`, `D.friendReplies`, `D.GROUP`.
@@ -169,10 +169,11 @@ openInterstitial(kind: "descanso" | "reto", challenge?: Challenge): void
 - **Responsibility:** asks "¿Cuánto tiempo piensas usar la app?". Preselects
   the time from `mostRecentEntry()?.minutes` mapped through `timeIdForMinutes`
   (a `null` minutes maps to no id, so "Indefinido" is never preselected), else
-  `"10"`. Shows at most 2 alternatives (`alternativesFor()`) as filled `button`s,
+  `"10"`. Shows at most 2 alternatives (`alternativesFor()`) as two square tiles in a
+  2-column grid (`aspect-square`, `bg-white/60`, border `primary`),
   the chips from `D.times` (5 / 10 / 15 min and "Indefinido" with `minutes:
-  null`) and "Igual quiero entrar" as `UI.textButton` (same pattern as the
-  interstitial).
+  null`) and "Igual quiero entrar" as `UI.textButton` below the tiles (same
+  pattern as the interstitial).
 - **Indefinido (6.7):** `state.minutes = null`, so `onEnter.feed` does not call
   `schedule(...)` and no time sheet ever opens; `renderers.entrando` already
   omits the minutes when `minutes` is null.
@@ -181,8 +182,10 @@ openInterstitial(kind: "descanso" | "reto", challenge?: Challenge): void
 
 - **Responsibility:** "¿Cómo te sientes después?" as a sheet over the feed;
   `checkout-pick` / `checkout-skip` both call `saveCurrentEntry()` then
-  `go("cierre")`; `onEnter.cierre` schedules `go("home")` after 1500 ms with no
-  button. `renderers.cierre` picks the copy from `state.exceeded`.
+  `go("cierre")`; `onEnter.cierre` schedules `go("home")` after 3000 ms with no
+  button. `renderers.cierre` picks message, subtitle and background color from
+  `state.emotionOut` (7.4) and, when `state.exceeded || realMinutes() >= 20`, shows
+  a PILAS card (`UI.pilasIcon`) instead of the character (7.5).
 - **Depends on:** `saveCurrentEntry` (guards double-save with `state.saved`).
 
 ### Descanso — `renderers.descanso*`, `recordDescansoEnd`, `endDescanso` (Req 5)
@@ -239,7 +242,9 @@ endDescanso(): void         // clearTimer(); recordDescansoEnd(); go("descanso-f
 ### Bottom navigation — `bottomNav(active)` (Req 5.1)
 
 Four destinations: Hoy (`go-inicio`), Grupo (`go-grupo`), Descanso
-(`go-descanso`), Yo (`go-yo`). Only the current one is `active`.
+(`go-descanso`), Yo (`go-yo`). Only the current one is `active`, and it is easy to
+spot: a low-opacity `primary` pill (`bg-primary/20`) behind its icon, a thicker
+icon stroke and a bold label; the others stay `ink-soft`.
 
 ### Leave something to a friend — `renderers.dejarmensaje` (Req 8)
 
@@ -335,8 +340,9 @@ sampleBreaks(): { id; minutes; realMinutes; date }[];
 4. "Listo" → `inicio` (5.4).
 
 **Scenario C — reply to a friend (Req 4):** `nota` → "Responderle" →
-`responder` ("Enviar" disabled) → pick "¡Dale!" → "Enviar" → `afterNote()` →
-check-in sheet. "Volver" instead → `nota` with the same note.
+`responder` ("Enviar" disabled) → pick "¡Dale!" → "Enviar" → back to `nota` with
+"Le respondiste a Vale: ¡Dale!" and one "Entrar a Instagram" action → `afterNote()` →
+check-in sheet. "Volver" instead → `nota` with the same note and both actions.
 
 **Scenario D — fresh start, no challenge (Req 3.7, 6.7, 9):** the prototype boots
 with no challenge joined, so tapping Instagram goes straight to the friend note
@@ -388,7 +394,7 @@ document describes code that already exists.
    `initialProfile()`.
 
 Smaller alignments, no behavior change: Req 4.2's "record that the reply was
-sent" is satisfied by `replyChoice` being consumed by `reply-send`; if the
+sent" is satisfied by `state.replySent` plus `replyChoice` / `replyChar`, shown back on `nota`; if the
 group wants it visible later, it can go into `state` like `sentNotes`.
 
 ## Testing strategy
@@ -416,7 +422,7 @@ checks (`MANUAL` in `task-verifier`), then replayed by `test-plan.md`.
   - Source check: boot line is `go("home")` (1.1).
   - Source check: in `openInterstitial` and `renderers.nota`, "Entrar igual" is
     rendered with `textButton` and the other action with a primary `button`;
-    same for "Igual quiero entrar" in `renderers.alternativa` (3.1, 3.2, 4.7, 6.4).
+    same for "Igual quiero entrar" in `renderers.alternativa`, whose two alternatives are tiles, not buttons (3.1, 3.2, 4.7, 6.4).
 - **Edge cases (manual):**
   - Break + joined challenge → one sheet only (3.3).
   - Backdrop tap on each sheet does not block entry and has a visible
@@ -507,3 +513,12 @@ checks (`MANUAL` in `task-verifier`), then replayed by `test-plan.md`.
   stays visible, in `ink`, with a 44px touch area, and is never disabled or
   delayed — **Alternative considered:** equal tonal buttons; replaced at the
   group's request.
+- **Decision:** The two alternatives are soft square tiles and not filled buttons —
+  **Rationale:** two dark buttons next to "Seguir" elsewhere read as two primary
+  actions and confused the choice; tiles read as "pick one of these", with
+  "Igual quiero entrar" as plain text below — **Alternative considered:** two
+  filled primary buttons (previous version); replaced at the group's request.
+- **Decision:** The closing message and color depend on the exit emotion, and a
+  PILAS card replaces the character after a long stay — **Rationale:** the
+  closing screen should not feel the same every time, and PILAS speaks
+  without blaming — **Alternative considered:** one fixed message; rejected.
