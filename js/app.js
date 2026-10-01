@@ -179,7 +179,8 @@
       const friend = D.GROUP[n.from];
       const e = D.EMO.alegria;
       return `
-        <div class="h-full flex flex-col px-lg pt-2xl text-center" style="background:${e.bg}">
+        <div class="h-full flex flex-col px-lg text-center" style="background:${e.bg}">
+         <div class="flex-1 flex flex-col items-center justify-center">
           <div class="flex justify-center">${character("alegria", 120)}</div>
           <div class="flex items-center justify-center gap-sm mt-xl">
             ${personAvatar(friend, 32)}
@@ -190,7 +191,8 @@
           ${n.gift === "flor" ? `<div class="bg-surface rounded-card border border-line p-md mt-lg mx-auto flex flex-col items-center gap-xs">${flower(96)}<p class="text-caption text-ink-soft">${friend.name} te mandó una flor</p></div>` : ""}
           ${state.replySent ? `<p class="text-label text-ink mt-lg">Le respondiste a ${friend.name}: ${sentReplyText()}.</p>` : ""}
           <p class="text-label text-ink-soft mt-lg">${friend.name} no ve si entras, cuánto tiempo ni cómo te sientes.</p>
-          <div class="mt-auto pb-xl flex flex-col gap-sm">
+         </div>
+          <div class="pb-xl flex flex-col gap-sm">
             ${state.replySent
               ? button(`Entrar a ${D.APP[state.app]?.name || "la red"}`, { action: "note-enter" })
               : button("Responderle", { action: "note-reply" }) + textButton("Entrar igual", { action: "note-enter" })}
@@ -251,12 +253,15 @@
 
     // 8b. Pantalla simple de la actividad → vuelve a 0
     "alternativa-hecha"() {
-      return screen({
-        title: alternativesFor()[state.alt] || "Buena elección",
-        subtitle: "Cuando quieras, vuelves a tu celular.",
-        body: `<div class="flex justify-center py-lg">${character(state.emotionIn, 120)}</div>`,
-        actions: button("Volver al celular", { action: "open-home-demo" }),
-      });
+      return `
+        <div class="h-full flex flex-col items-center px-lg text-center">
+          <div class="flex-1 flex flex-col items-center justify-center">
+            <div class="flex justify-center">${character(state.emotionIn, 120)}</div>
+            <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-xl">${alternativesFor()[state.alt] || "Buena elección"}</h1>
+            <p class="text-body text-ink-soft mt-sm">Cuando quieras, vuelves a tu celular.</p>
+          </div>
+          <div class="pb-xl w-full">${button("Volver al celular", { action: "open-home-demo" })}</div>
+        </div>`;
     },
 
     // 9. Entrando (1 s, automática)
@@ -292,15 +297,19 @@
 
     // 12. Te pasaste — honesto, sin castigo
     pasaste() {
-      return screen({
-        title: `Llevas ${realMinutes()} min. Dijiste ${state.minutes}.`,
-        body: `<div class="rounded-card bg-state-fuera/30 p-lg flex items-center gap-md">
-            ${character(state.emotionIn, 56)}
-            <p class="text-body text-ink">Puedes salir o seguir. Tú decides.</p></div>`,
-        actions:
-          button("Salir", { action: "over-exit" }) +
-          button("Seguir", { variant: "secondary", action: "over-continue" }),
-      });
+      return `
+        <div class="h-full flex flex-col px-lg">
+          <div class="flex-1 flex flex-col items-center justify-center text-center">
+            <h1 tabindex="-1" class="text-title-lg text-ink outline-none">Llevas ${realMinutes()} min. Dijiste ${state.minutes}.</h1>
+            <div class="rounded-card bg-state-fuera/30 p-lg flex items-center gap-md mt-lg text-left w-full">
+              ${character(state.emotionIn, 56)}
+              <p class="text-body text-ink">Puedes salir o seguir. Tú decides.</p></div>
+          </div>
+          <div class="pb-xl flex flex-col gap-sm">
+            ${button("Salir", { action: "over-exit" })}
+            ${button("Seguir", { variant: "secondary", action: "over-continue" })}
+          </div>
+        </div>`;
     },
 
     // 11b. Mensaje de cierre — 3 s y vuelve sola al celular (ver onEnter.cierre).
@@ -316,12 +325,17 @@
       const { msg, sub } = msgs[out] || { msg: "Es tu decisión, sigue así.", sub: "Elegir con calma también es avanzar." };
       const long = state.exceeded || realMinutes() >= 20; // "ya llevas bastante en redes"
       const body = long
-        ? `<div class="bg-surface rounded-card border border-line p-md flex items-center gap-md">
+        ? `<div class="bg-surface rounded-card border border-line p-md flex items-center gap-md text-left w-full">
              <span class="inline-block shrink-0 w-14 h-14">${pilasIcon(56)}</span>
              <p class="text-body text-ink">PILAS: llevas un buen rato en redes. Un descanso te puede caer bien.</p></div>`
-        : `<div class="flex justify-center py-lg">${avatar(out || state.emotionIn, 140)}</div>`;
-      // Todo el texto en ink (sobre el color de la emoción): el apoyo va en el cuerpo, no como subtítulo gris.
-      return screen({ title: msg, body: `<p class="text-body text-ink -mt-md mb-md">${sub}</p>${body}`, bg: (D.EMO[out] || D.EMO.alegria).bg });
+        : `<div class="flex justify-center">${avatar(out || state.emotionIn, 140)}</div>`;
+      // Todo centrado (se cierra sola, no hay nada más que tocar). Todo el texto en ink sobre el color de la emoción.
+      return `
+        <div class="h-full flex flex-col items-center justify-center text-center px-lg gap-md" style="background:${(D.EMO[out] || D.EMO.alegria).bg}">
+          ${body}
+          <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-md">${msg}</h1>
+          <p class="text-body text-ink">${sub}</p>
+        </div>`;
     },
 
     // 13. Inicio — el día sin puntaje (sin totales, sin rachas)
@@ -425,11 +439,13 @@
     // Descanso activo — pausa a pantalla completa, sin bajar nada si sale antes
     "descanso-activo"() {
       return `
-        <div class="h-full flex flex-col items-center px-lg pt-2xl text-center" style="background:${D.EMO.calma.bg}">
-          <div class="flex justify-center">${character("calma", 120)}</div>
-          <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-xl">Descansando ${state.descanso.minutes} min</h1>
-          <p class="text-body text-ink mt-sm">No pasa nada si sales antes.</p>
-          <div class="mt-auto pb-xl flex flex-col gap-sm w-full">
+        <div class="h-full flex flex-col items-center px-lg text-center" style="background:${D.EMO.calma.bg}">
+          <div class="flex-1 flex flex-col items-center justify-center">
+            <div class="flex justify-center">${character("calma", 120)}</div>
+            <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-xl">Descansando ${state.descanso.minutes} min</h1>
+            <p class="text-body text-ink mt-sm">No pasa nada si sales antes.</p>
+          </div>
+          <div class="pb-xl flex flex-col gap-sm w-full">
             ${button("Ir al celular", { variant: "tonal", action: "descanso-go-home" })}
             ${button("Salir antes", { variant: "tonal", action: "descanso-end" })}
           </div>
@@ -439,11 +455,13 @@
     // Descanso fin — cierre simple, sin puntaje
     "descanso-fin"() {
       return `
-        <div class="h-full flex flex-col items-center px-lg pt-2xl text-center">
-          <div class="flex justify-center">${character("calma", 120)}</div>
-          <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-xl">Terminó tu descanso</h1>
-          <p class="text-body text-ink mt-sm">Volviste cuando quisiste.</p>
-          <div class="mt-auto pb-xl w-full">${button("Listo", { action: "descanso-close" })}</div>
+        <div class="h-full flex flex-col items-center px-lg text-center">
+          <div class="flex-1 flex flex-col items-center justify-center">
+            <div class="flex justify-center">${character("calma", 120)}</div>
+            <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-xl">Terminó tu descanso</h1>
+            <p class="text-body text-ink mt-sm">Volviste cuando quisiste.</p>
+          </div>
+          <div class="pb-xl w-full">${button("Listo", { action: "descanso-close" })}</div>
         </div>`;
     },
 
