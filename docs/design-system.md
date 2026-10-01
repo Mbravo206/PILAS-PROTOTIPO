@@ -42,7 +42,7 @@ Solo relleno, siempre con texto `ink`. **Nunca indican bien o mal.** Provisional
 
 | Token | Tamaño / línea · peso | Ejemplo |
 |---|---|---|
-| `title-lg` | 28/34 · 700 | ¿Cómo llegas? |
+| `title-lg` | 28/34 · 700 | ¿Cómo te sientes? |
 | `title-md` | 22/28 · 700 | Tu semana |
 | `body` | 16/24 · 400 | Saliste cuando quisiste. Mañana puedes volver a elegir. |
 | `label` | 14/20 · 500 | Guardar intención |
@@ -59,20 +59,22 @@ Solo relleno, siempre con texto `ink`. **Nunca indican bien o mal.** Provisional
 
 | Componente | Especificación | En código |
 |---|---|---|
-| **Botón** | 3 variantes (`primary` · `secondary` · `tonal`), 5 estados. Alto 52px, pill, `label` 14/500. Una primaria por pantalla. Pressed secondary: `primary` al 8%; pressed tonal: `line`. Cargando: verbo en gerundio ("Guardando"). | `UI.button()` |
+| **Botón** | 5 variantes: `primary`, `secondary`, `tonal`, `active` (ya activado) y `phone` (amarillo, con ícono de celular: vuelve al celular simulado). Alto 52px, pill, `label` 14/500. Una acción principal por pantalla. Pressed secondary: `primary` al 8%; pressed tonal: `line`. | `UI.button()` |
+| **Botón de texto** | La salida discreta de una decisión ("Entrar igual"): texto `ink` subrayado, sin fondo, borde ni redondeo. Siempre visible y de 44px de alto. | `UI.textButton()` |
 | **Botón de icono** | 44 × 44, tonal. Cerrar, volver, opciones. Siempre `aria-label`. | `UI.iconButton()` |
 | **Chip** | Alto 40px. Seleccionado con emoción: color de la emoción + personaje 20px. Sin emoción: borde 2px `primary`. | `UI.chip()` |
-| **EmotionCard / Grid** | Grilla de 2 columnas para check-in. | `UI.emotionCard()` |
-| **Interruptor** | 52 × 32 dentro de fila de 56px. Apagado con borde `ink-soft`. `role="switch"`. | — (fuera de alcance) |
+| **EmotionCard / Grid** | Grilla de 2 columnas (2 × 2 con 4 emociones). Versión `compact` de 64px para las hojas inferiores: texto `label` y menos relleno para que "Aburrimiento" quepa. | `UI.emotionCard()` |
+| **Interruptor** | 52 × 32 dentro de fila de 56px. Apagado con borde `ink-soft`. `role="switch"`. | `UI.toggle()` |
 | **Input** | Con `helper` o `error`. Radio 16. | — |
 | **Slider** | Intensidad con palabras en los extremos (Poco / Mucho). | — |
-| **Card** | `featured` = protagonista con `shadow-pilas`. Máx. una por pantalla. | pantalla 13 |
-| **IntentionSummary** | Lo que dijiste vs. lo que pasó, sin calificar. | pantalla 13 |
-| **ListRow** | Filas de ajustes de 56px. | pantalla 13 |
+| **Card** | `featured` = protagonista con `shadow-pilas`. Máx. una por pantalla. | Hoy (reto de hoy) |
+| **IntentionSummary** | Lo que dijiste vs. lo que pasó, sin calificar. | sin usar por ahora (Hoy ya no lo muestra) |
+| **ListRow** | Filas de 56px: ajustes, redes con pausa, grupo. | Yo, Grupo |
 | **BottomSheet** | Sube en 200ms, fondo `ink` al 40%. Se cierra tocando fuera o "Ahora no". | `#sheet-layer` |
-| **BottomNav** | 4 destinos: Hoy · Grupo · Descanso · Yo. | pantalla 13 |
+| **BottomNav** | 4 destinos: Hoy · Grupo · Descanso · Yo. La pestaña actual lleva una píldora `primary` al 20% detrás del ícono, ícono más grueso y etiqueta en negrita. | `bottomNav()` en `app.js` |
 | **Personaje** | Blob por emoción con cara: ojos + boca que cambia según la emoción (sonrisa en calma/alegría, zigzag en ansiedad, línea en aburrimiento). `face="minima"` (con cara) o `"ninguna"` (blob liso). Al tocarlo, parpadea. | `UI.character()` |
-| **Avatar** | Personaje sobre `surface` con borde `line`. Sin personaje: inicial blanca sobre `primary`. | — |
+| **Avatar** | De una emoción: personaje sobre `surface` con borde `line`. De una persona: círculo de un color propio y su inicial en `ink` (18px/700 sobre el morado, que da 4.4:1). Nunca dos personas con el mismo color. | `UI.avatar()`, `UI.personAvatar()` |
+| **Flor** | Regalo que un amigo manda en una nota. Mismo trazo grueso `ink` que el personaje. | `UI.flower()` |
 | **Screen / PauseScreen** | Esqueleto de pantalla (safe areas, título, acciones, nav) y plantilla de pausa a pantalla completa. | `screen()` en `app.js` |
 
 **Íconos:** Lucide, `strokeWidth 1.5`, 24px.
@@ -101,7 +103,7 @@ Tuteo, como un par. Frases cortas. Botones dicen exactamente qué pasa. Sin emoj
 
 | Situación | Sí | No |
 |---|---|---|
-| Antes de abrir una red | ¿Cómo llegas? | ¿Seguro que quieres entrar? |
+| Antes de abrir una red | ¿Cómo te sientes? | ¿Seguro que quieres entrar? |
 | Se pasó de la intención | Llevas 25 min. Dijiste 10. | ¡Superaste tu límite! |
 | Cumplió la intención | Saliste cuando quisiste. | ¡Lo estás haciendo increíble! |
 | Salida de una pausa | Ahora no | Prefiero seguir perdiendo tiempo |

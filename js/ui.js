@@ -5,7 +5,7 @@ window.UI = (function () {
   const attrs = (action, value) =>
     `${action ? `data-action="${action}"` : ""} ${value != null ? `data-value="${value}"` : ""}`;
 
-  // Botón · 4 variantes. Alto 52px, pill, label 14/500. Una primaria por pantalla.
+  // Botón · variantes: primary, secondary, tonal, active y phone. Alto 52px, pill, label 14/500.
   // Secundario y tonal llevan fondo blanco: sobre el color de una emoción no se pierden.
   // "phone" = vuelve al celular simulado (amarillo + ícono de celular).
   // "active" = estado ya activado (p. ej. "Estás en el reto"): verde de intención + check.
@@ -20,7 +20,6 @@ window.UI = (function () {
       secondary: "bg-surface border-2 border-primary text-ink active:bg-line",
       tonal: "bg-surface border-2 border-primary/30 text-ink active:bg-line",
       active: "bg-state-intencion border-2 border-ink/20 text-ink active:brightness-95",
-      // "phone" = lleva al celular simulado (el inicio de la demo): amarillo, distinto al azul de las demás acciones.
       phone: "bg-emo-alegria border-2 border-ink/20 text-ink active:brightness-95",
     };
     const ic = icon ? `<i data-lucide="${icon}" class="w-5 h-5 mr-sm pop" stroke-width="2" aria-hidden="true"></i>` : "";
@@ -40,8 +39,7 @@ window.UI = (function () {
       <i data-lucide="${icon}" class="w-6 h-6 text-ink" stroke-width="1.5"></i></button>`;
   }
 
-  // Boca por emoción: sin esto el personaje solo tenía ojos, no una cara real.
-  // Trazo grueso (#1F2240), mismo estilo en las 5 + una por defecto para "sin emoción" (PILAS, avatares genéricos).
+  // Boca por emoción. Trazo grueso (#1F2240) igual en todas, más una por defecto para "sin emoción" (PILAS).
   const MOUTHS = {
     calma: `<path d="M39 61q11 8 22 0" stroke="#1F2240" stroke-width="4" stroke-linecap="round" fill="none"/>`,
     alegria: `<path d="M33 58q17 20 34 0" stroke="#1F2240" stroke-width="4" stroke-linecap="round" fill="none"/>`,
@@ -98,7 +96,7 @@ window.UI = (function () {
     return `<span class="inline-block w-3 h-3 rounded-full" style="background:${e.bg}" aria-hidden="true"></span>`;
   }
 
-  // Avatar · personaje sobre surface con borde line (pantallas 13/14, grupo)
+  // Avatar con el personaje de una emoción, sobre surface con borde line
   function avatar(emotionId, size = 40) {
     return `<span class="inline-flex items-center justify-center rounded-full bg-surface border border-line overflow-hidden shrink-0" style="width:${size}px;height:${size}px">
       ${character(emotionId, Math.round(size * 0.8))}</span>`;

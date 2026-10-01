@@ -1,6 +1,5 @@
-// js/app.js — router de pantallas + estado + lógica del flujo
-// Entrada: 0 (celular simulado). El ícono PILAS lleva a 13 (Hoy). Flujo mínimo:
-// 0 → ¿Cómo te sientes? → 8 (otra cosa + tiempo) → 9 → feed → 10 → ¿Cómo te sientes después? → 0 (+ 12).
+// js/app.js — estado, router de pantallas, hojas inferiores y acciones del flujo.
+// Flujo: celular simulado (home) → aviso o nota → check-in → alternativas y tiempo → feed → salida → cierre → home.
 (function () {
   const D = window.PILAS_DATA;
   const { button, textButton, iconButton, character, chip, emotionCard, emotionDot, avatar, personAvatar, flower, toggle, pilasIcon } = window.UI;
@@ -26,19 +25,19 @@
     };
   }
 
-  // ---------- Estado de la sesión actual (spec §4) ----------
+  // ---------- Estado de la sesión actual ----------
   const state = {
     screen: "home",
     app: null,        // red elegida al abrir el celular simulado
     emotionIn: null,  // "¿Cómo te sientes?" (hoja de check-in)
-    minutes: null,    // pantalla 8 (null = entró con "Ahora no", sin tiempo)
-    timeId: null,     // chip de tiempo elegido en la pantalla 8
+    minutes: null,    // null = sin tiempo ("Indefinido" o "Ahora no")
+    timeId: null,     // chip de tiempo elegido
     startedAt: null,  // timestamp al entrar al feed
-    emotionOut: null, // pantalla 11
+    emotionOut: null, // emoción al salir
     exceeded: false,
-    alt: null,        // alternativa elegida en 8
+    alt: null,        // alternativa elegida
     saved: false,     // evita guardar dos veces la misma sesión
-    currentNote: null, // pantalla 10b: nota de amigo pendiente de mostrar
+    currentNote: null, // nota de amigo que se está mostrando
     replyChoice: null, // respuesta rápida elegida al responder al amigo
     replyChar: null,   // muñequito elegido al responder al amigo
     replySent: false,  // ya le respondió a la nota actual (la nota se muestra con confirmación)
@@ -89,7 +88,7 @@
     saveEntries([...loadEntries(), entry]);
     state.saved = true;
   }
-  // Última entrada guardada, usada para preseleccionar el tiempo de la pantalla 8
+  // Última entrada guardada: preselecciona el tiempo de las alternativas
   function mostRecentEntry() {
     const entries = loadEntries();
     return entries.length ? entries.slice().sort((a, b) => new Date(b.date) - new Date(a.date))[0] : null;
@@ -141,12 +140,11 @@
       </div>`;
   }
 
-  // Texto de lo que Sami le respondió al amigo (frase y/o muñequito)
   const sentReplyText = () => [D.friendReplies[state.replyChoice], D.replyDolls.find((d) => d.id === state.replyChar)?.label].filter(Boolean).join(" · ");
 
   // ---------- Pantallas ----------
   const renderers = {
-    // 0. Celular simulado (mínimo) — solo demuestra la intercepción al abrir una red.
+    // Celular simulado (mínimo): solo demuestra la intercepción al abrir una red.
     // En una app real esto sería un Accessibility Service (Android) o Screen Time (iOS):
     // HTML/CSS/JS no puede interceptar el lanzamiento de otra app de verdad.
     home() {
@@ -173,7 +171,7 @@
         </div>`;
     },
 
-    // 10b. Nota de un amigo antes de entrar — no bloquea, no ve tu uso
+    // Nota de un amigo antes de entrar: no bloquea y no ve tu uso
     nota() {
       const n = state.currentNote;
       const friend = D.GROUP[n.from];
@@ -205,7 +203,7 @@
       const n = state.currentNote;
       const friend = D.GROUP[n.from];
       const chips = D.friendReplies.map((r, i) => chip(r, { action: "pick-reply", value: i, selected: state.replyChoice === i })).join("");
-      // Muñequitos para responder sin palabras ("Listo", "Lo pensaré"…): el personaje con una carita. Elegido = anillo primary.
+      // Muñequitos: respuesta sin palabras. Elegido = anillo primary.
       const dolls = D.replyDolls.map((e) => {
         const on = state.replyChar === e.id;
         return `<button type="button" class="hit-44 relative flex flex-col items-center gap-xs p-xs rounded-card border-2 transition duration-200 ease-out active:scale-[0.98] ${on ? "border-primary bg-line/60" : "border-transparent"}"
@@ -230,11 +228,10 @@
       });
     },
 
-    // 8. Otra opción + tiempo — las alternativas son dos fichas cuadradas suaves; "Igual quiero entrar" es texto plano debajo, siempre visible.
-    // Aquí vive la única pregunta de tiempo; llega preseleccionado (ver goAlternativa).
+    // Alternativas + única pregunta de tiempo (llega preseleccionado, ver goAlternativa).
     alternativa() {
       const e = D.EMO[state.emotionIn];
-      // Dos fichas cuadradas, una al lado de la otra: tono suave (blanco translúcido), para no competir con el botón oscuro de otras pantallas.
+      // Dos fichas cuadradas de tono suave: no compiten con los botones oscuros de otras decisiones.
       const opts = `<p class="text-label text-ink">Prueba una de estas</p>
         <div class="grid grid-cols-2 gap-sm">${alternativesFor().map((a, i) => `
           <button type="button" class="aspect-square rounded-card border-2 border-primary bg-white/60 text-ink text-label text-center p-md flex items-center justify-center transition duration-200 ease-out active:scale-[0.98] active:bg-white/80"
@@ -251,7 +248,7 @@
       });
     },
 
-    // 8b. Pantalla simple de la actividad → vuelve a 0
+    // Confirmación de la alternativa elegida
     "alternativa-hecha"() {
       return `
         <div class="h-full flex flex-col items-center px-lg text-center">
@@ -264,7 +261,7 @@
         </div>`;
     },
 
-    // 9. Entrando (1 s, automática)
+    // Entrando (1 s, automática)
     entrando() {
       const t = D.times.find((x) => x.id === state.timeId);
       const app = D.APP[state.app]?.name || "la red";
@@ -295,7 +292,7 @@
         </div>`;
     },
 
-    // 12. Te pasaste — honesto, sin castigo
+    // Te pasaste: honesto, sin castigo
     pasaste() {
       return `
         <div class="h-full flex flex-col px-lg">
@@ -312,7 +309,7 @@
         </div>`;
     },
 
-    // 11b. Mensaje de cierre — 3 s y vuelve sola al celular (ver onEnter.cierre).
+    // Cierre: 3 s y vuelve sola al celular (ver onEnter.cierre).
     // El mensaje y el color cambian con la emoción de salida; si llevas rato en redes habla PILAS.
     cierre() {
       const out = state.emotionOut;
@@ -329,7 +326,6 @@
              <span class="inline-block shrink-0 w-14 h-14">${pilasIcon(56)}</span>
              <p class="text-body text-ink">PILAS: llevas un buen rato en redes. Un descanso te puede caer bien.</p></div>`
         : `<div class="flex justify-center">${avatar(out || state.emotionIn, 140)}</div>`;
-      // Todo centrado (se cierra sola, no hay nada más que tocar). Todo el texto en ink sobre el color de la emoción.
       return `
         <div class="h-full flex flex-col items-center justify-center text-center px-lg gap-md" style="background:${(D.EMO[out] || D.EMO.alegria).bg}">
           ${body}
@@ -338,7 +334,7 @@
         </div>`;
     },
 
-    // 13. Inicio — el día sin puntaje (sin totales, sin rachas)
+    // Hoy: reto, grupo, acceso a Descanso y notas a amigos; sin totales ni rachas
     inicio() {
       const h = new Date().getHours();
       const greet = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
@@ -378,7 +374,7 @@
         </div>`;
     },
 
-    // 14. Tu grupo — tiempo de cada uno + retos activos, sin ranking de éxito
+    // Grupo: quién está en el reto, premiados y retos activos; sin ranking ni tiempos ajenos
     grupo() {
       return `
         <div class="h-full flex flex-col">
@@ -465,7 +461,7 @@
         </div>`;
     },
 
-    // Dejarle algo a un amigo — composición real: a quién, qué mensaje
+    // Dejarle algo a un amigo: a quién y qué mensaje
     dejarmensaje() {
       const friends = D.group.filter((m) => !m.self);
       const friendChips = friends.map((m) => chip(m.name, { action: "note-pick-friend", value: m.id, selected: state.noteDraft.friendId === m.id })).join("");
@@ -488,7 +484,7 @@
       });
     },
 
-    // 15. Yo — perfil que describe, no califica (design-system §6)
+    // Yo: perfil que describe, no califica
     yo() {
       const goalsList = [...D.goals, ...state.customGoals].filter((g) => !state.dismissedGoalIds.includes(g.id));
       const pct = Math.round((D.focus.current / D.focus.target) * 100);
@@ -606,7 +602,7 @@
       </div>`;
   }
 
-  // Vista previa de "Tu grupo" en Inicio: primeros 4, enlaza a la pantalla 14 completa.
+  // Vista previa de "Tu grupo" en Inicio: primeros 4, enlaza a Grupo completo.
   function groupSection() {
     return `
       <div class="flex items-center justify-between">
@@ -646,7 +642,7 @@
       </li>`).join("");
   }
 
-  // Retos activos (pantalla 14): varios retos a la vez, cada uno con su propia adhesión.
+  // Retos activos: cada uno con su propia adhesión
   function challengesSection() {
     // Siempre exactamente 2: los 2 del grupo, o el primero + el último que propuso Sami.
     const base = D.challenges.slice(0, 2);
@@ -704,7 +700,7 @@
       <p class="text-caption text-ink-soft mt-sm">Sin puntos ni ranking: es solo para celebrarlos.</p>`;
   }
 
-  // BottomNav · 3 destinos, todos funcionan en el prototipo vertical.
+  // Navegación inferior: Hoy, Grupo, Descanso y Yo
   function bottomNav(active) {
     const items = [
       ["Hoy", "home", "go-inicio", "inicio"],
@@ -767,7 +763,7 @@
     sheetHideTimeout = setTimeout(() => (layer.hidden = true), 200);
   }
 
-  // ---------- 10. Aviso de intención (hoja inferior) ----------
+  // ---------- Aviso de tiempo cumplido (hoja inferior) ----------
   function openSheet() {
     const layer = $("#sheet-layer");
     layer.querySelector(".sheet-backdrop").dataset.action = "sheet-more";
@@ -782,7 +778,7 @@
     showSheet();
   }
 
-  // ---------- Interstitial: "Rato sin redes" / "Reto" antes de abrir una red ----------
+  // ---------- Aviso antes de abrir una red durante un descanso o un reto ----------
   // "Seguir..." es el botón oscuro; "Entrar igual" es texto plano, pero siempre visible: nunca bloquea la entrada.
   function openInterstitial(kind, challenge) {
     const layer = $("#sheet-layer");
@@ -820,10 +816,10 @@
   }
   const afterNote = () => openCheckin();
 
-  // Alternativas de la pantalla 8 según cómo llega Sami (las mismas que usa 8b)
+  // Alternativas según cómo llega Sami
   const alternativesFor = () => D.alternatives[state.emotionIn] || D.alternatives.default;
 
-  // Pantalla 8: el tiempo llega preseleccionado con el de la última vez (o 10 min) → nunca bloquea "Entrar".
+  // El tiempo llega preseleccionado con el de la última vez (o 10 min): nunca bloquea entrar.
   function goAlternativa() {
     const id = timeIdForMinutes(mostRecentEntry()?.minutes) ?? "10";
     state.timeId = id;
@@ -855,7 +851,7 @@
       </div>`;
   }
 
-  // ---------- ¿Cómo te sientes después?: hoja sobre el feed, se cierra sola (Requirement 7) ----------
+  // ---------- ¿Cómo te sientes después?: hoja sobre el feed; al elegir pasa al cierre ----------
   function openExitSheet() {
     const layer = $("#sheet-layer");
     const grid = D.emotions.map((e, i) => {
@@ -949,7 +945,7 @@
     "toggle-app-pause": (v) => { state.pausedApps[v] = !state.pausedApps[v]; rerender(); },
     "toggle-setting": (v) => { state.settings[v] = !state.settings[v]; rerender(); },
 
-    // Déjale algo a un amigo (Requirement 8)
+    // Déjale algo a un amigo
     "open-note-composer": () => { state.noteDraft = { friendId: null, suggestion: null, custom: "" }; go("dejarmensaje"); },
     "note-pick-friend": (v) => { state.noteDraft.friendId = v; rerender(); },
     "note-pick-suggestion": (v) => { state.noteDraft.suggestion = Number(v); rerender(); },
@@ -961,10 +957,10 @@
     },
     "note-back": () => { state.noteDraft = { friendId: null, suggestion: null, custom: "" }; go("inicio"); },
 
-    // Pantalla 8: el tiempo se elige aquí y solo aquí
+    // El tiempo se elige aquí y solo aquí
     "pick-time": (v) => { state.timeId = v; state.minutes = D.times.find((t) => t.id === v).minutes; rerender(); },
 
-    // Check-in en hoja: una emoción y sigue a la pantalla 8
+    // Check-in en hoja: una emoción y sigue a las alternativas
     "checkin-pick-emotion": (v) => { checkin.emotion = v; renderCheckin(); },
     "checkin-enter": () => { state.emotionIn = checkin.emotion; closeSheet(); checkin = null; goAlternativa(); },
     "checkin-skip": () => { closeSheet(); checkin = null; go("entrando"); }, // nunca se bloquea la entrada
@@ -978,13 +974,13 @@
     "over-exit": () => { clearTimer(); go("feed", { soft: true }); openExitSheet(); },
     "over-continue": () => { go("feed"); schedule(5, () => go("pasaste")); },
 
-    // ¿Cómo sales? en hoja, se cierra sola (Requirement 7)
+    // ¿Cómo te sientes después?: guarda y pasa al cierre
     "checkout-pick": (v) => { state.emotionOut = v; saveCurrentEntry(); closeExitSheetAndShowClosing(); },
     "checkout-skip": () => { saveCurrentEntry(); closeExitSheetAndShowClosing(); },
 
     "go-today": () => go("inicio"),
 
-    // Descanso (Requirement 5)
+    // Descanso
     "descanso-pick-time": (v) => { state.descanso.timeId = v; rerender(); },
     "descanso-start": () => {
       const t = D.breakTimes.find((t) => t.id === state.descanso.timeId);

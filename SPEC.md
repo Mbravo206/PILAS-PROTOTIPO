@@ -2,7 +2,7 @@
 
 **Proyecto:** Examen de Seguimiento 2026-2S · Diseño Interactivo UJTL · Grupo 7
 **Responsable del prototipo:** Mariana Bravo Celestino
-**Estado:** Aprobado — 30 sep 2026 (D1, D2 y D3 cerradas)
+**Estado:** Aprobado — 30 sep 2026 (D1 a D4 cerradas)
 
 Este documento orienta todo el trabajo. El detalle técnico está en
 `docs/spec.md`; el visual en `docs/design-system.md`; el copy y objetivo de
@@ -22,8 +22,8 @@ derivan de aquí y no pueden contradecirlo: si algo cambia, se cambia aquí prim
   supervisión adulta.
 - **Enfoque del grupo:** brainrot y ciclos de dopamina en adolescentes.
 - **Ejes que ataca el prototipo:** 2. Selección consciente de contenidos
-  (nombrar la emoción y la intención antes de entrar) y 3. Establecimiento de
-  límites de tiempo (tiempo elegido + aviso sin castigo).
+  (nombrar la emoción antes de entrar y poder elegir otra cosa) y 3. Establecimiento de
+  límites de tiempo (tiempo elegido o indefinido + aviso sin castigo).
 
 ## 2. Qué se entrega
 
@@ -40,12 +40,13 @@ antes de dormir. Padres/tutores: stakeholders, no aparecen en esta tarea.
 
 | ID | Decisión | Resultado |
 | --- | --- | --- |
-| D1 | Tarea a prototipar | Abrir una red social con intención y salir sin culpa (flujo 0 → 6 → 7 → 8 → 9 → 10 → 12 → 11 → 13) |
+| D1 | Tarea a prototipar | Abrir una red social con intención y salir sin culpa (flujo en `docs/pantallas.md`) |
 | D2 | Plataforma / stack | HTML + CSS + JS vanilla, Tailwind con tokens propios, todo local (sin internet ni servidor). Ver `CLAUDE.md` → Stack |
 | D3 | Nombre del sistema | PILAS ("ponerse las pilas": darse cuenta y actuar por decisión propia) |
+| D4 | Publicación | Sitio estático en Vercel (https://pilas-prototipo.vercel.app); cada push a `main` lo publica |
 
-Decisiones provisionales de producto (Sin tiempo, quinta emoción, nav
-inferior…): `docs/spec.md` §9.
+Decisiones provisionales de producto (arranque sin reto, 4 emociones, tiempo
+indefinido, peso de las decisiones…): `docs/spec.md` §9.
 
 ## 5. Alcance
 
@@ -53,16 +54,16 @@ inferior…): `docs/spec.md` §9.
 estados vacíos y de cierre; datos de ejemplo ficticios coherentes con Sami;
 retroalimentación visual (sonido opcional con el tema de Shara).
 
-**Fuera:** login, cuentas, backend; onboarding, registro semanal, ajustes y
-modo Pomodoro (se muestran inactivos); integración real con redes; datos
-reales de entrevistados.
+**Fuera:** login, cuentas, backend; onboarding, registro semanal, ajustes
+completos y modo Pomodoro; integración real con redes; datos reales de
+entrevistados.
 
 ## 6. Restricciones
 
 | Restricción | Valor |
 | --- | --- |
 | Formatos de la convocatoria | HTML, CSS, JS |
-| Peso | Carpeta del grupo ≤ 200 MB; el prototipo pesa < 1 MB |
+| Peso | Carpeta del grupo ≤ 200 MB; el prototipo (sin `node_modules`) pesa pocos MB |
 | Idioma de la interfaz | Español |
 | Patrones oscuros | Prohibidos: scroll infinito como gancho, autoplay, urgencia falsa, desconexión difícil, acción forzada |
 | Privacidad | Sin datos personales reales; uso de IA declarado (AIAS) |
@@ -86,8 +87,8 @@ Todo spec de feature hereda estos criterios.
 | Entrada | De | Se usa para |
 | --- | --- | --- |
 | Persona master | Polo | Datos de ejemplo y copy |
-| Diagrama de afinidades | Nicol | Emociones finales (pantallas 6 y 11) |
-| Entrevistas | Nicol, Polo | Alternativas de la pantalla 8 |
+| Diagrama de afinidades | Nicol | Emociones finales (check-in y salida) |
+| Entrevistas | Nicol, Polo | Alternativas de "¿Y si pruebas otra cosa primero?" |
 | Wireframes en papel | Daniela, Shara | Layout de cada pantalla |
 | Pantallas en Figma / guía de estilos | Shara, Daniela, Mariana | G4 (exportar PNG a `docs/figma/`) |
 | Tema principal / sonido | Shara | Feedback sonoro (opcional) |

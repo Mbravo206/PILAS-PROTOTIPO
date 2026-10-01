@@ -1,21 +1,18 @@
 # PILAS · Spec del prototipo vertical
-> v0.5 · Grupo 7 · Leer junto con `design-system.md` y `pantallas.md` (misma carpeta)
-> Cambios frente a v0.2: alineación con el flujo del Figma de referencia — ver
-> `docs/specs/2026-09-30-figma-flow-alignment/` (requirements.md).
-> v0.4: la app **abre en el celular simulado (0)**; "Hoy" (13) se alcanza con el
-> ícono PILAS. Los flujos de Instagram y TikTok terminan de vuelta en el celular.
+> v0.6 · Grupo 7 · Leer junto con `design-system.md` y `pantallas.md` (misma carpeta).
+> El spec de la feature de alineación con el Figma está en `docs/specs/2026-09-30-figma-flow-alignment/` (requirements.md y design.md).
 
 ## 1. Qué se construye
 
 Prototipo móvil funcional de **una tarea**: abrir una red social con intención y salir sin culpa.
-La app abre en el **celular simulado mínimo (0)**, que demuestra la
-intercepción — en producción eso sería un Accessibility Service (Android) o
-Screen Time (iOS); HTML/CSS/JS no puede interceptar el lanzamiento real de
-otra app. Flujo desde ahí: **0 → (interstitial de descanso/reto) → (nota de
-amigo) → check-in rápido → 9 → feed → (aviso) → ¿cómo sales? → 0**. El ícono
-PILAS del celular abre "Hoy" (13).
 
-**Fuera de alcance:** onboarding, registro semanal, ajustes, modo Pomodoro, login, backend.
+La app abre en el **celular simulado** (`home`), que demuestra la intercepción: en producción sería un Accessibility Service (Android) o Screen Time (iOS), porque HTML/CSS/JS no puede interceptar el lanzamiento de otra app. Desde ahí:
+
+**home → (aviso de descanso o reto) → (nota de un amigo) → check-in → alternativas y tiempo → feed → (aviso o te pasaste) → salida → cierre → home**
+
+El ícono de PILAS del celular abre **Hoy**; Hoy, Grupo, Descanso y Yo se navegan con la barra inferior. El detalle de cada pantalla está en `pantallas.md`.
+
+**Fuera de alcance:** onboarding, registro semanal, ajustes completos, modo Pomodoro, login, backend.
 
 ## 2. Stack
 
@@ -27,6 +24,7 @@ PILAS del celular abre "Hoy" (13).
 | Iconos | Lucide, copia local en `js/vendor/` | Design system, offline |
 | Datos | `localStorage` (con respaldo en memoria si falla) | Persistencia simple entre recargas |
 | Navegación | SPA de un solo `index.html`, cambio de pantalla con JS | Un ejecutable que abre con doble clic |
+| Publicación | Sitio estático en Vercel (https://pilas-prototipo.vercel.app). Cada push a `main` lo publica | Probar en celular sin descargar nada |
 
 ## 3. Estructura de archivos
 
@@ -35,16 +33,17 @@ pilas-prototipo/
 ├── index.html               # contenedor + una <section data-screen="..."> por pantalla
 ├── css/
 │   ├── styles.css           # fuente local, marco de celular, hoja inferior, reduced motion
-│   └── tailwind.css         # GENERADO — no editar a mano (tools/ → npm run build:css)
+│   └── tailwind.css         # GENERADO, no editar a mano (tools/ → npm run build:css)
 ├── js/
 │   ├── tailwind.config.js   # tokens del design system (colores, tipografía, espaciado, radios, sombra)
-│   ├── data.js              # emociones, tiempos, alternativas, apps, premiados, logros, datos de ejemplo
-│   ├── ui.js                # componentes: button, iconButton, chip, emotionCard, character, emotionDot
+│   ├── data.js              # emociones, tiempos, alternativas, apps, grupo, retos, mensajes y datos de ejemplo
+│   ├── ui.js                # componentes: button, textButton, iconButton, chip, emotionCard, character, avatar, personAvatar, flower, toggle…
 │   ├── app.js               # estado + router + pantallas + acciones + timers + localStorage
 │   └── vendor/lucide.min.js
 ├── assets/fonts/            # Rubik woff2
-├── tools/                   # solo para regenerar css/tailwind.css
-└── docs/                    # spec, design system, pantallas
+├── tools/                   # solo para regenerar css/tailwind.css y correr las pruebas
+├── docs/                    # spec, design system, pantallas, specs de feature
+└── .vercelignore            # qué NO se publica (docs, diseños, herramientas)
 ```
 
 ## 4. Presentación
@@ -55,86 +54,117 @@ pilas-prototipo/
 ## 5. Estado
 
 ```js
-// js/app.js
+// js/app.js — sesión actual (se reinicia al volver al celular)
 const state = {
-  screen: "home", // pantalla activa — el celular simulado es la entrada
-  app: null,        // red elegida al abrir el celular simulado
-  emotionIn: null,  // "¿Cómo te sientes?" (hoja de check-in)
-  intent: null,     // intención (7, o del check-in rápido)
-  minutes: null,    // tiempo elegido (7) · null = sin tiempo
-  timeId: null,     // chip de tiempo elegido
-  startedAt: null,  // timestamp al entrar al feed
-  emotionOut: null, // emoción de salida (11)
-  exceeded: false,  // si se pasó del tiempo
-  alt: null,        // alternativa elegida (8)
-  saved: false,     // evita guardar dos veces
-  replyChoice: null,    // respuesta rápida al responder a un amigo
-  noteDraft: {...},     // borrador de "Dejarle algo a un amigo"
-  descanso: {...},      // descanso activo (rato sin redes)
-  descansoHistory: [],  // historial de descansos
+  screen: "home",        // pantalla activa; la app arranca en el celular simulado
+  app: null,             // red que se tocó
+  emotionIn: null,       // emoción del check-in
+  minutes: null,         // tiempo elegido; null = sin tiempo ("Indefinido" o "Ahora no")
+  timeId: null,          // chip de tiempo elegido
+  startedAt: null,       // timestamp al entrar al feed
+  emotionOut: null,      // emoción al salir
+  exceeded: false,       // se pasó del tiempo elegido
+  alt: null,             // alternativa elegida
+  saved: false,          // evita guardar dos veces la misma sesión
+  currentNote: null,     // nota de amigo que se está mostrando
+  replyChoice: null,     // frase elegida al responder
+  replyChar: null,       // muñequito elegido al responder
+  replySent: false,      // ya respondió a la nota actual
+  // Perfil y grupo: solo se borran con "Reiniciar prototipo"
+  joinedChallenges: {},  // retos en los que está Sami (empieza sin ninguno)
+  customChallenges: [],  // retos que propuso
+  noteQueue: [],         // notas de amigos pendientes de mostrar
+  noteDraft: {},         // borrador de "Déjale algo a un amigo"
+  noteConfirmation: null,// a quién le escribió (se muestra una vez en Hoy)
+  customGoals: [], dismissedGoalIds: [],
+  pausedApps: {},        // redes con pausa encendida (Instagram y TikTok)
+  settings: { pauseBeforeOpen: true, shareTime: true },
+  descanso: {},          // descanso activo: active, startedAt, minutes, timeId
+  descansoHistory: [],   // descansos terminados, con su duración real
 };
 ```
 
-**Registro** en `localStorage` bajo `pilas.entries` (array):
+**Registro** en `localStorage` bajo `pilas.entries` (array). Se usa para preseleccionar el tiempo de la próxima vez; Hoy ya no lo muestra:
 ```js
-{ id, app, emotionIn, intent, minutes, realMinutes, emotionOut, exceeded, date }
+{ id, app, emotionIn, minutes, realMinutes, emotionOut, exceeded, date }
 ```
 
 ## 6. Pantallas y comportamiento
 
-| # | `data-screen` | Entra desde | Acciones → destino | Criterio de aceptación |
-|---|---|---|---|---|
-| 13 | `inicio` | Ícono PILAS del celular / pestaña "Hoy" | "Volver al inicio" → 0 · "Reiniciar prototipo" | Sin lista de entradas del día; sin totales ni rachas |
-| 0 | `home` | Arranque de la app / `cierre` / "Volver al inicio" en Hoy | Tocar Instagram o TikTok → interstitial o check-in · PILAS → 13 | Solo redes con pausa + PILAS, sin apps decorativas |
-| — | interstitial (hoja) | Tocar una red con descanso o reto activo | "Seguir descansando/el reto" → 0 · "Entrar igual" → sigue el flujo | Mismo peso visual, nunca bloquea |
-| `nota` | `nota` | Cola de notas de amigos | "Responderle" → `responder` · "Entrar igual" → check-in | Una sola vez por nota, no ve el uso |
-| — | `responder` | `nota` | Elegir respuesta + "Enviar" → check-in · "Volver" → `nota` | "Enviar" requiere una respuesta elegida |
-| — | check-in (hoja) | Tras la nota (o directo) | "¿Cómo te sientes?": emoción + "Seguir" → 8 · "Ahora no" → 9 | Una sola pregunta; "Seguir" deshabilitado hasta elegir. Sin "¿A qué vas?" |
-| 8 | `alternativa` | check-in | Alternativa → 8b → 0 · "Igual quiero entrar" → 9 | "¿Y si pruebas otra cosa primero?" + única pregunta de tiempo (5/10/15, preseleccionado). Mismo peso visual |
-| 9 | `entrando` | check-in ("Ahora no"), 8 | Automática (1 s) → feed | Muestra la red y el tiempo |
-| — | `feed` | 9, 12 | Scroll · botón X → hoja "¿Cómo te sientes después?" | Guarda `startedAt` una sola vez |
-| 10 | hoja `#sheet-layer` | Feed al cumplirse el tiempo | "Salir" → hoja "¿Cómo te sientes después?" · "5 min más" (o tocar fuera) → feed | Hoja inferior, no pantalla completa |
-| 12 | `pasaste` | Feed tras los 5 min extra | "Salir" → hoja "¿Cómo te sientes después?" · "Seguir" → feed (vuelve a avisar en 5 min) | Minutos reales vs. elegidos |
-| — | "¿Cómo te sientes después?" (hoja) | 10, 12, X del feed | Emoción o "Saltar" → guarda y `cierre` (auto, 1.5 s) → 0 | Hoja sobre el feed con tarjetas de color, se cierra sola |
-| — | `cierre` | hoja "¿Cómo te sientes después?" | Automática (1.5 s) → 0 | "Es tu decisión, sigue así." + frase corta; si se pasó, "Listo. Mañana es otro día." Sin botón manual |
-| — | `descanso` / `descanso-activo` / `descanso-fin` | Nav "Descanso" | "Empezar descanso" → activo · "Salir antes" o fin automático → `descanso-fin` → 13 | Sin castigo si sale antes |
-| — | `dejarmensaje` | Card en Hoy | Amigo + mensaje + "Enviar mensaje" → 13 (confirmación) · "Volver" → 13 | Requiere amigo y mensaje elegido/escrito |
+Resumen. El objetivo, el contenido y el copy de cada una están en `pantallas.md`.
+
+| `data-screen` / hoja | Entra desde | Acciones → destino | Criterio de aceptación |
+|---|---|---|---|
+| `home` | Arranque, cierre, "Volver al inicio", "Ir al celular", "Volver al celular" | Una red → aviso, nota o check-in · PILAS → `inicio` | Solo redes con pausa + PILAS, sin apps decorativas |
+| Aviso de descanso o reto (hoja) | Tocar una red con descanso o reto activo | "Seguir descansando" / "Seguir el reto" → `home` · "Entrar igual" → sigue el flujo | "Entrar igual" siempre visible; nunca bloquea; un solo aviso a la vez |
+| `nota` | Cola de notas de amigos | "Responderle" → `responder` · "Entrar igual" → check-in | Una vez por nota; el amigo no ve el uso |
+| `responder` | `nota` | "Enviar" y "Volver" → `nota` | "Enviar" requiere una frase o un muñequito |
+| Check-in (hoja) | Tras la nota (o directo) | Emoción + "Seguir" → `alternativa` · "Ahora no" → `entrando` | Una sola pregunta; "Seguir" deshabilitado hasta elegir |
+| `alternativa` | Check-in | Una ficha → `alternativa-hecha` · "Igual quiero entrar" → `entrando` | Pregunta de tiempo con "Indefinido"; "Igual quiero entrar" visible |
+| `alternativa-hecha` | `alternativa` | "Volver al celular" → `home` | — |
+| `entrando` | Check-in ("Ahora no"), `alternativa` | Automática (1 s) → `feed` | Muestra la red y el tiempo |
+| `feed` | `entrando`, `pasaste` | X → salida | Guarda `startedAt` una sola vez |
+| Aviso de tiempo (hoja) | Feed, al cumplirse el tiempo | "Salir" → salida · "5 min más" (o tocar fuera) → `feed` | Hoja inferior; no sale con "Indefinido" |
+| `pasaste` | Feed, tras los 5 min extra | "Salir" → salida · "Seguir" → `feed` | Minutos reales vs. elegidos |
+| Salida (hoja) | X, aviso de tiempo, `pasaste` | Emoción o "Saltar" → guarda y `cierre` | Hoja sobre el feed con tarjetas de color |
+| `cierre` | Salida | Automática (3 s) → `home` | Mensaje y color según la emoción; tarjeta de PILAS si llevó rato |
+| `inicio` (Hoy) | Ícono PILAS, barra inferior | "Volver al inicio" → `home` · "Crear un foco" → `descanso` · "Escribir mensaje" → `dejarmensaje` | Sin totales, rachas ni lista de entradas |
+| `grupo` | Barra inferior | Retos: "Le entro" / "Salir del reto" · "Proponer un reto" | Sin tiempos ajenos ni ranking |
+| `descanso`, `descanso-activo`, `descanso-fin` | Barra inferior, "Crear un foco" | "Empezar descanso" → activo · "Salir antes" o fin automático → `descanso-fin` → `inicio` | Sin castigo si sale antes |
+| `dejarmensaje` | Tarjeta en Hoy | Amigo + mensaje + "Enviar mensaje" → `inicio` · "Volver" → `inicio` | Requiere amigo y mensaje elegido o escrito |
+| `yo` | Barra inferior | Interruptores de redes y ajustes · "Agregar meta" | Describe, no califica |
 
 ## 7. Modo demo (pitch)
 
 - **Tiempo acelerado:** 1 minuto elegido = 5 segundos. `index.html?demo=1` o **triple toque en la barra de estado**. Se ve "modo demo" en la barra.
-- **Reiniciar prototipo** (pantalla 13): borra `localStorage` y vuelve a 0 (celular).
-- **Datos de ejemplo:** 2 entradas precargadas si no hay nada guardado.
+- **Reiniciar prototipo** (en Hoy): borra `localStorage`, deja a Sami sin reto y vuelve al celular.
+- **Datos de ejemplo:** 2 entradas y 2 descansos precargados si no hay nada guardado.
 
 ## 8. Reglas que el código no puede romper
 
-- Toda pantalla que interrumpe tiene salida visible ("Ahora no", "Seguir", "Saltar").
+- Toda pantalla que interrumpe tiene salida visible ("Ahora no", "Seguir", "Saltar", "Entrar igual").
 - Nunca se bloquea la entrada a la red.
 - No aparece rojo salvo en errores técnicos.
-- No hay contador regresivo visible en 6, 7 ni 8 (ni en el feed).
-- Una sola acción primaria por pantalla.
+- Sin contador regresivo visible en ninguna pantalla.
+- Una acción principal por pantalla; las salidas discretas ("Entrar igual", "Igual quiero entrar") son texto plano pero siempre visibles y con área táctil de 44 px.
+- Sin rachas, puntos, niveles ni trofeos; sin tiempos de otras personas.
 - Áreas táctiles de mínimo 44 × 44 px (chips de 40 px usan `.hit-44`).
 - Respeta `prefers-reduced-motion`.
 
-## 9. Decisiones provisionales tomadas en el código (validar en grupo)
+## 9. Decisiones provisionales (validar en grupo)
 
 | Tema | Qué hace hoy el código | Dónde cambiarlo |
 |---|---|---|
-| "Sin tiempo" | Vuelve como chip "Indefinido" (pantalla 8) y también ocurre con "Ahora no": no hay aviso de tiempo, se sale con la X del feed | `data.js → times` |
-| 4 emociones en 2 columnas | Se quitó Tristeza: queda una grilla 2 × 2; tarjetas siempre de color, con la carita sobre un círculo blanco | `app.js → renderCheckin`, `ui.js → emotionCard` |
-| Navegación inferior | 4 destinos: Hoy · Grupo · Descanso · Yo (todos funcionan). El design system (§ BottomNav) aún dice Hoy · Emociones · Intenciones · Yo — desactualizado | `app.js → bottomNav` |
+| Arranque | Sami empieza sin ningún reto; el aviso de reto solo sale si se une a uno | `data.js → challenges.selfDefault` |
+| Emociones | 4: Calma, Alegría, Ansiedad, Aburrimiento, en 2 × 2. Tristeza se quitó del selector. Provisionales hasta el diagrama de afinidades | `data.js → emotions` |
+| Tiempo | 5, 10, 15 min o "Indefinido" (sin aviso). "Ahora no" también entra sin tiempo | `data.js → times` |
+| Peso de las decisiones | La opción con intención va en botón oscuro; "Entrar igual" e "Igual quiero entrar" van en texto plano. **Riesgo:** puede leerse como patrón oscuro. Mitigación: siempre visible, 44 px, sin demora | `ui.js → textButton`, `app.js` |
+| Aviso de descanso o reto | Tocar fuera equivale a "Seguir". "Entrar igual" termina el descanso y lo guarda en el historial, sin penalización | `app.js → openInterstitial` |
+| Tocar fuera del aviso de tiempo | Cuenta como "5 min más" | `index.html → .sheet-backdrop` |
+| Responder a un amigo | "Enviar" vuelve a la nota con una confirmación y un solo botón, "Entrar a ‹red›" | `app.js → actions["reply-send"]` |
+| Cierre | 3 s; mensaje y color según la emoción de salida; tarjeta de PILAS si se pasó o llevó 20 min o más | `app.js → renderers.cierre` |
+| Navegación inferior | 4 destinos: Hoy · Grupo · Descanso · Yo; la actual lleva una píldora de baja opacidad | `app.js → bottomNav` |
 | Ajuste "Pausa antes de abrir redes" | Apagado: abrir una red entra directo, sin nota ni check-in | `app.js → actions["open-app"]` |
-| Grupo | "Los premiados de hoy" muestra 2 personas, sin puntos ni ranking; "Retos activos" muestra siempre 2 | `data.js → rewarded, challenges` |
-| Descanso | "Tus logros": 3 estadísticas simuladas con barra y % (reemplaza "Tus descansos") | `data.js → breakStats` |
-| Tocar fuera de la hoja 10 | Cuenta como "5 min más" | `index.html → .sheet-backdrop` |
+| Redes con pausa | Solo Instagram y TikTok, con la pausa encendida; el celular muestra las que estén encendidas | `data.js → apps` |
+| Grupo | Chips "En curso" o "✓ Cumplió"; sin tiempos ajenos (el propio es privado y opcional); 2 premiados; 2 retos | `data.js → group, challenges, rewarded` |
+| Avatares | Color propio por persona + inicial | `data.js → group.color`, `ui.js → personAvatar` |
+| Hoy | Sin "Tu última vez" ni lista de entradas; tarjeta "Crea un foco" que lleva a Descanso con 2 min | `app.js → renderers.inicio` |
+| Botones al celular | "Volver al inicio", "Ir al celular" y "Volver al celular" son amarillos con ícono de celular | `ui.js → button (variant phone)` |
+| Descanso | "Tus logros": 3 estadísticas simuladas con barra y % | `data.js → breakStats` |
+| Mensajes de amigos | Ligeros y sin compromisos ("Ey ey, ¡pilas con el cel!"); una nota puede traer una flor | `data.js → friendNotes` |
 | Cara del personaje | `face="minima"` (dos ojos) | `ui.js → character()` |
-| Alternativas de la pantalla 8 | Las del borrador, pendientes de entrevistas | `data.js → alternatives` |
+| Alternativas | Las del borrador, pendientes de entrevistas | `data.js → alternatives` |
+
+**Pendientes de código** (ver `docs/specs/2026-09-30-figma-flow-alignment/design.md`, "Known gaps"):
+1. El temporizador del descanso comparte el `timer` de la sesión; al abrir una red se cancela y el descanso no termina solo hasta volver a su pantalla.
+2. "Enviar mensaje" en `dejarmensaje` solo guarda el nombre del amigo para la confirmación, no el mensaje.
 
 ## 10. Criterios de "listo"
 
-- [x] El flujo mínimo corre de principio a fin sin errores en consola (probado en Chromium, modo demo).
+- [x] El flujo corre de principio a fin sin errores en consola (probado en Chromium, modo demo).
 - [ ] Probado en otro computador (Chrome y un navegador más).
 - [x] Abre con doble clic en `index.html`, sin servidor ni internet.
 - [ ] Probado en un celular real.
 - [x] Modo demo funciona.
-- [x] Carpeta de fuentes + ejecutable pesa menos de 20 MB (~0,5 MB).
+- [x] Fuentes + ejecutable pesan mucho menos de 20 MB (sin `tools/node_modules`).
+- [x] Publicado en Vercel.

@@ -1,172 +1,162 @@
 # PILAS · Pantallas de la app
-> Borrador v0.1 · Grupo 7 · Usa los tokens y componentes de `design-system.md`. Lo que ya se construyó está en `spec.md`.
+> v0.2 · Grupo 7 · Usa los tokens y componentes de `design-system.md`. El estado, las reglas técnicas y las decisiones están en `spec.md`.
 
 **Tarea principal (prototipo vertical):** abrir una red social con intención y salir sin culpa.
 **Usuario:** Sami, 17 años, Bogotá. Entra a redes en automático en pausas de estudio y antes de dormir.
 
-Leyenda de alcance:
-- 🟣 **Prototipo vertical**: se construye funcional para la entrega.
-- ⚪ **Contexto**: se diseña en wireframe, no se programa.
-- 🟡 **Hipótesis**: depende de validar con entrevistas.
+Cada pantalla se llama igual que su `data-screen` en `index.html`. Las hojas inferiores no son pantallas: viven en `#sheet-layer`.
+
+Leyenda: 🟣 construido en el prototipo · ⚪ contexto (no se programa) · 🟡 depende de validar con entrevistas.
 
 ---
 
-## Flujo general
+## Flujo
 
 ```mermaid
 flowchart TD
-    A[0. Home simulado] -->|Toca una red| B[6. ¿Cómo llegas?]
-    B --> C[7. ¿A qué vas?]
-    C -->|"No sé" o aburrimiento| D[8. Otra opción]
-    C -->|Intención clara| E[9. Entrando]
-    D -->|Igual quiero entrar| E
-    D -->|Elige otra cosa| A
-    E --> F[10. Aviso de intención]
-    F -->|Salir| G[11. ¿Cómo sales?]
-    F -->|Seguir| H[12. Te pasaste]
-    H --> G
-    G --> I[13. Inicio]
+    H[home · celular simulado] -->|Toca una red| P{¿Descanso o reto activo?}
+    P -->|Sí| I[Aviso en hoja]
+    P -->|No| N
+    I -->|Seguir descansando / Seguir el reto| H
+    I -->|Entrar igual| N{¿Hay nota de un amigo?}
+    N -->|Sí| NO[nota]
+    NO -->|Responderle| R[responder]
+    R -->|Enviar| NO
+    R -->|Volver| NO
+    NO -->|Entrar| C
+    N -->|No| C[Check-in en hoja: ¿Cómo te sientes?]
+    C -->|Ahora no| E[entrando]
+    C -->|Seguir| A[alternativa + tiempo]
+    A -->|Igual quiero entrar| E
+    A -->|Elige otra cosa| AH[alternativa-hecha]
+    AH --> H
+    E --> F[feed]
+    F -->|Se cumple el tiempo| T[Aviso de tiempo en hoja]
+    T -->|5 min más| F
+    F -->|Pasan los 5 min extra| PA[pasaste]
+    PA -->|Seguir| F
+    T -->|Salir| S
+    PA -->|Salir| S
+    F -->|X| S[Salida en hoja: ¿Cómo te sientes después?]
+    S --> CI[cierre · 3 s]
+    CI --> H
 ```
 
----
-
-## Onboarding ⚪
-
-### 1. Bienvenida
-- **Objetivo:** presentar PILAS en una frase.
-- **Contenido:** personaje grande, nombre, `title-lg`.
-- **Copy borrador:** "Ponte las pilas con tus redes. Sin bloquearlas."
-- **Acciones:** Primario "Empezar" → 2.
-
-### 2. Cómo funciona
-- **Objetivo:** explicar el mecanismo antes de pedir permisos.
-- **Contenido:** 3 pasos cortos con ilustración pequeña (una sola pantalla, no carrusel).
-  1. Antes de abrir una red, te preguntamos cómo llegas.
-  2. Decides a qué vas y cuánto tiempo.
-  3. Sales cuando quieras. Sin castigos.
-- **Acciones:** Primario "Entendido" → 3.
-
-### 3. Elige tus redes
-- **Objetivo:** que Sami decida qué apps acompaña PILAS.
-- **Contenido:** lista con toggles, iconos genéricos (no logos reales).
-- **Copy borrador:** "¿Con cuáles quieres ir con más calma?"
-- **Acciones:** Primario "Guardar redes" → 4 · Secundario "Después".
-
-### 4. Tus momentos
-- **Objetivo:** conocer cuándo pierde el control (dato del desk research).
-- **Contenido:** chips de selección múltiple: Al despertar · Antes de dormir · Estudiando · Cuando me aburro · Otro.
-- **Copy borrador:** "¿Cuándo sientes que entras sin pensarlo?"
-- **Acciones:** Primario "Guardar" → 5 · Secundario "Saltar".
-
-### 5. Listo
-- **Contenido:** personaje + "Listo. La próxima vez que abras una red, aquí estamos."
-- **Acciones:** Primario "Ir al inicio" → 13.
+Desde `home`, el ícono PILAS abre **Hoy**. Hoy, Grupo, Descanso y Yo se navegan con la barra inferior.
 
 ---
 
 ## Tarea principal 🟣
 
-### 0. Home simulado del celular
-- **Objetivo:** simular el celular de Sami para disparar el flujo (en HTML no se puede interceptar apps reales).
-- **Contenido:** fondo de pantalla, 6–8 iconos inventados, 2 de ellos marcados como redes.
-- **Acciones:** tocar un icono de red → 6.
-- **Nota:** usar iconos inventados, no logos de TikTok o Instagram.
+### home · Celular simulado
+- **Objetivo:** demostrar la intercepción al abrir una red. En HTML no se puede interceptar una app real; en producción sería un Accessibility Service (Android) o Screen Time (iOS).
+- **Contenido:** fecha y hora, un ícono por cada red con pausa encendida (Instagram, TikTok) y el ícono de PILAS.
+- **Acciones:** tocar una red → flujo de entrada · tocar PILAS → Hoy.
+- **Reglas:** sin apps decorativas ni logos reales.
 
-### 6. ¿Cómo llegas?
-- **Objetivo:** que Sami nombre su emoción antes de entrar (oportunidad de diseño del desk research).
-- **Contenido:** `title-lg`, grilla de 2 columnas con tarjetas de emoción (componente 5.3).
-- **Copy borrador:** "¿Cómo llegas?" · ayuda: "Solo tú lo ves."
-- **Acciones:**
-  - Seleccionar emoción → activa primario "Seguir" → 7.
-  - Secundario "Ahora no" → entra directo a la red (9). No se bloquea.
-- **Reglas:** ninguna emoción se marca como buena o mala. Sin contador.
+### Aviso de descanso o reto (hoja)
+- **Objetivo:** recordar, sin bloquear, que Sami está en un descanso o en un reto.
+- **Copy:** "Estás en un descanso. ¿Sigues así?" · `Estás en el reto "…". ¿Sigues así?`
+- **Acciones:** "Seguir descansando" o "Seguir el reto" (botón oscuro) → home · "Entrar igual" (texto plano) → sigue el flujo.
+- **Reglas:** "Entrar igual" siempre visible y sin penalización. Tocar fuera equivale a seguir. Descanso tiene prioridad: nunca salen dos avisos seguidos.
 
-### 7. ¿A qué vas?
-- **Objetivo:** convertir la entrada automática en una decisión.
-- **Contenido:**
-  - Chips de intención (selección única): Hablar con alguien · Buscar algo puntual · Descansar un rato · No sé.
-  - Chips de tiempo: 5 min · 10 min · 15 min · Sin tiempo.
-- **Copy borrador:** "¿A qué vas?" · "¿Cuánto tiempo?"
-- **Acciones:**
-  - Primario "Entrar" → 9.
-  - Si eligió "No sé" o la emoción es aburrimiento → 8.
-- **Pendiente:** ¿"Sin tiempo" se permite? Decidir en grupo.
+### nota · Nota de un amigo
+- **Objetivo:** que un amigo le deje algo a Sami antes de entrar, sin presión.
+- **Contenido:** personaje, "‹Amigo› te dejó algo antes de entrar", el mensaje (puede traer un dibujo o una flor) y "‹Amigo› no ve si entras, cuánto tiempo ni cómo te sientes."
+- **Mensajes de ejemplo:** "Ey ey, ¡pilas con el cel!" · "Te dibujé esto, no te rías." · "Te mandé esta flor para que te concentres."
+- **Acciones:** "Responderle" (oscuro) → responder · "Entrar igual" (texto plano) → check-in.
+- **Después de responder:** la misma nota muestra "Le respondiste a ‹Amigo›: …" y una sola acción, "Entrar a ‹red›".
 
-### 8. Otra opción (opcional)
-- **Objetivo:** ofrecer una alternativa, no una prohibición.
-- **Contenido:** fondo pleno del color de la emoción (componente 5.6), 2 o 3 alternativas cortas según la emoción.
-  - Aburrimiento: "Escribirle a alguien" · "Poner una canción" · "Salir 5 min".
-  - Ansiedad: "Respirar 1 minuto" · "Escribir qué te preocupa".
-- **Copy borrador:** "¿Y si pruebas otra cosa primero?"
-- **Acciones:**
-  - Elegir alternativa → pantalla simple de la actividad → vuelve a 0.
-  - Secundario "Igual quiero entrar" → 9 (mismo tamaño y visibilidad que las opciones).
-- 🟡 Las alternativas deben salir de las entrevistas: qué hace Sami cuando no está en redes.
+### responder · Responder al amigo
+- **Contenido:** el mensaje del amigo con su avatar, frases cortas ("¡Dale!", "¡Gracias!", "Jaja, listo") y muñequitos con carita: "Listo", "Lo pensaré", "Ahorita no puedo", "Te cuento luego".
+- **Acciones:** "Enviar" (activo con una frase, un muñequito o ambos) → vuelve a la nota · "Volver" → nota.
+- **Reglas:** responder nunca es obligatorio.
 
-### 9. Entrando
-- **Objetivo:** confirmar la intención y dar paso a la red.
-- **Contenido:** transición de 1 s con la intención elegida.
-- **Copy borrador:** "Vas a descansar un rato · 10 min"
-- **Acciones:** automática → pantalla simulada de feed (imagen estática o scroll de placeholders).
+### Check-in (hoja) · ¿Cómo te sientes?
+- **Objetivo:** que Sami nombre su emoción antes de entrar.
+- **Contenido:** "¿Cómo te sientes?" · "Solo tú lo ves." · 4 tarjetas de color en 2 × 2: Calma, Alegría, Ansiedad, Aburrimiento.
+- **Acciones:** "Seguir" (activo al elegir) → alternativa · "Ahora no" → entrando.
+- **Reglas:** ninguna emoción es buena o mala. No se pregunta a qué va.
 
-### 10. Aviso de intención
-- **Objetivo:** avisar sin interrumpir de golpe.
-- **Contenido:** hoja inferior (no pantalla completa) sobre el feed simulado.
-- **Copy borrador:** "Ya van tus 10 min. ¿Cómo vas?"
-- **Acciones:**
-  - Primario "Salir" → 11.
-  - Secundario "5 min más" → vuelve al feed; al terminar → 12.
-- **Reglas:** sin rojo, sin vibración fuerte, sin cuenta regresiva.
+### alternativa · ¿Y si pruebas otra cosa primero?
+- **Objetivo:** ofrecer una alternativa y preguntar el tiempo, sin prohibir.
+- **Contenido:** fondo del color de la emoción; "¿Cuánto tiempo piensas usar la app?" con 5 min · 10 min · 15 min · Indefinido (10 min preseleccionado, o el de la última vez); "Prueba una de estas" con dos fichas cuadradas según la emoción (p. ej. "Escribirle a alguien", "Poner una canción", "Respirar 1 minuto").
+- **Acciones:** una ficha → alternativa-hecha · "Igual quiero entrar" (texto plano) → entrando.
+- **Reglas:** "Indefinido" entra sin aviso de tiempo. 🟡 Las alternativas deben salir de las entrevistas.
 
-### 11. ¿Cómo sales?
-- **Objetivo:** cerrar el ciclo emocional (¿funcionó como alivio o no?).
-- **Contenido:** misma grilla de emociones que la pantalla 6, en versión compacta de chips.
-- **Copy borrador:** "¿Cómo sales?"
-- **Acciones:** seleccionar → mensaje breve → 13. Secundario "Saltar".
-- **Mensaje de cierre:** "Saliste cuando quisiste." (si cumplió) · "Listo. Mañana es otro día." (si se pasó).
+### alternativa-hecha
+- **Contenido:** la alternativa elegida y "Cuando quieras, vuelves a tu celular."
+- **Acciones:** "Volver al celular" (amarillo, con ícono de celular) → home.
 
-### 12. Te pasaste
-- **Objetivo:** informar con honestidad, sin castigo.
-- **Contenido:** dato simple, fondo `surface`, acento `state-fuera`.
-- **Copy borrador:** "Llevas 25 min. Dijiste 10."
-- **Acciones:** Primario "Salir" → 11 · Secundario "Seguir".
-- **Regla:** "Seguir" siempre disponible. PILAS no bloquea.
+### entrando
+- **Contenido:** automática, 1 s: "Entrando a ‹red› · 10 min" (sin el tiempo si es indefinido).
+- **Acciones:** ninguna → feed.
+
+### feed
+- **Contenido:** feed simulado con tarjetas de relleno y un botón X.
+- **Acciones:** X → salida. Al cumplirse el tiempo elegido, sale el aviso de tiempo.
+
+### Aviso de tiempo (hoja)
+- **Copy:** "Ya van tus 10 min. ¿Cómo vas?"
+- **Acciones:** "Salir" → salida · "5 min más" (o tocar fuera) → feed; si pasan, pasaste.
+- **Reglas:** sin rojo, sin vibración, sin cuenta regresiva.
+
+### pasaste
+- **Copy:** "Llevas 10 min. Dijiste 5." · "Puedes salir o seguir. Tú decides."
+- **Acciones:** "Salir" (oscuro) → salida · "Seguir" → feed (vuelve a avisar en 5 min).
+- **Reglas:** informa sin castigo; "Seguir" siempre disponible.
+
+### Salida (hoja) · ¿Cómo te sientes después?
+- **Contenido:** las mismas 4 emociones, en tarjetas de color, y "Saltar".
+- **Acciones:** elegir o "Saltar" → guarda la entrada → cierre.
+
+### cierre
+- **Objetivo:** cerrar el ciclo con un mensaje corto; se va sola a home a los 3 s.
+- **Contenido:** todo centrado, con el color de la emoción de salida.
+  - Calma o Alegría: "Cuando te pones las pilas, tienes el control."
+  - Ansiedad o Aburrimiento: "Tranqui, tú tienes el control." · "Busca algo que te anime."
+  - Sin emoción: "Es tu decisión, sigue así."
+- **Si llevó rato** (se pasó o 20 min o más): tarjeta de PILAS en lugar del personaje: "PILAS: llevas un buen rato en redes. Un descanso te puede caer bien."
+
+---
+
+## Secciones de la app 🟣
+
+### Hoy (inicio)
+- **Contenido:** saludo con la hora del día · Reto de hoy (única tarjeta con `shadow-pilas`) · vista previa de Tu grupo · "Crea un foco" (lleva a Descanso con 2 min) · "Déjale algo a un amigo" · "Volver al inicio" (amarillo, vuelve al celular) · "Reiniciar prototipo".
+- **No incluir:** total de horas, rachas, comparaciones, lista de entradas.
+
+### Grupo
+- **Contenido:** lista de amigos con un chip "En curso" o "✓ Cumplió" (ninguno si no está en un reto) · Los premiados de hoy (2, sin puntos ni ranking) · 2 retos activos con "Le entro" / "Estás en el reto" + "Salir del reto" · "Proponer un reto".
+- **Reglas:** no se ve el tiempo de uso de nadie más. El tiempo propio es privado y opcional.
+
+### Descanso
+- **Contenido:** tiempo sugerido (20 min) · chips 2 · 10 · 20 · 30 min · "Empezar descanso" · "Tus logros" con barras y porcentajes simulados.
+- **Reglas:** si sale antes no pasa nada.
+
+### descanso-activo y descanso-fin
+- **descanso-activo:** "Descansando ‹N› min" · "No pasa nada si sales antes." · "Ir al celular" (amarillo) · "Salir antes". Al cumplirse el tiempo pasa solo a descanso-fin.
+- **descanso-fin:** "Terminó tu descanso" · "Volviste cuando quisiste." · "Listo" → Hoy.
+
+### dejarmensaje · Déjale algo a un amigo
+- **Contenido:** ¿A quién? (amigos) · mensajes sugeridos ("Ey ey, ¡pilas con el cel!", "¿Cómo vas hoy?", "Acuérdate de tomar agua") · campo para escribir el propio.
+- **Acciones:** "Enviar mensaje" (activo con amigo y mensaje) → Hoy con confirmación · "Volver" → Hoy sin guardar.
+- **Reglas:** quien envía no ve si ni cuándo el otro abre una red.
+
+### Yo
+- **Contenido:** horas de foco del mes · metas (con "Agregar meta") · Redes con pausa (Instagram y TikTok, encendidas) · Lo que lograste este mes · Ajustes: Pausa antes de abrir redes, Compartir mi tiempo con el grupo, Cambiar personaje (próximamente).
+- **Reglas:** describe, no califica; solo Sami lo ve. Con "Pausa antes de abrir redes" apagado, abrir una red entra directo.
 
 ---
 
-## Pantallas secundarias ⚪
+## Contexto ⚪
 
-### 13. Inicio
-- **Objetivo:** mostrar el día sin puntaje.
-- **Contenido:**
-  - Saludo con la hora del día ("Buenas noches, Sami").
-  - Tarjeta protagonista (`shadow-pilas`): última entrada con emoción de llegada → emoción de salida.
-  - Lista de entradas del día: red, intención, tiempo, emoción.
-- **Navegación inferior:** Inicio · Registro · Ajustes. (⚠️ El design system define 4: Hoy · Emociones · Intenciones · Yo. El código usa los 4.)
-- **No incluir:** total de horas grande, rachas, comparaciones con otros.
-
-### 14. Registro
-- **Objetivo:** que Sami vea patrones, no números.
-- **Contenido:** semana en vista simple.
-  - "Entras más cuando: [emoción más frecuente]"
-  - "Tu momento más difícil: [momento más frecuente]"
-  - "Veces que saliste cuando quisiste: X de Y"
-- 🟡 Validar si a los adolescentes les sirve ver esto o lo sienten como vigilancia.
-
-### 15. Ajustes
-- **Contenido:** Mis redes · Mis momentos · Avisos (suave / ninguno) · Privacidad (qué datos se guardan, Ley 1581 de 2012) · Borrar mis datos.
-
-### 16. Modo pausa de estudio 🟡
-- **Objetivo:** acompañar el descanso del Pomodoro de Sami.
-- **Contenido:** al iniciar un descanso, la intención y el tiempo vienen predefinidos (5 min).
-- **Depende de:** confirmar en entrevistas que el Pomodoro es un rasgo real del usuario.
-
----
+- **Onboarding** (bienvenida, cómo funciona, elige tus redes, tus momentos): no se programa.
+- **Registro semanal** y **ajustes completos** (Privacidad, Ley 1581 de 2012, Borrar mis datos): no se programan. 🟡 Validar si ver patrones semanales se siente útil o como vigilancia.
+- **Modo pausa de estudio / Pomodoro** 🟡: depende de confirmar en entrevistas que es un rasgo real del usuario.
 
 ## Preguntas abiertas para el grupo
 
-1. ~~¿El prototipo vertical cubre de 0 a 11, o solo de 0 a 9?~~ Construido de 0 a 13, incluidas 8 y 12.
-2. ¿"Sin tiempo" en la pantalla 7 es válido o contradice el concepto? (hoy se permite)
-3. ¿Qué alternativas reales mencionaron los entrevistados para la pantalla 8?
-4. ¿Qué emociones salieron del diagrama de afinidades para la grilla de la pantalla 6?
-5. ¿Navegación inferior de 3 destinos (pantallas) o de 4 (design system)?
+1. ¿Qué alternativas reales mencionaron los entrevistados para "¿Y si pruebas otra cosa primero?"
+2. ¿Qué emociones salieron del diagrama de afinidades? Hoy son 4 provisionales.
+3. ¿El botón oscuro de "Seguir el reto" y el texto plano de "Entrar igual" cuentan como patrón oscuro? Ver `docs/spec.md` §9.

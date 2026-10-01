@@ -70,7 +70,7 @@ requires.
    alternativa-hecha ─► home               sheet: "¿Cómo te sientes después?"
                                                     │ emotion / "Saltar"
                                                     ▼
-                                      cierre (1.5 s, automatic) ─► home
+                                      cierre (3 s, automatic) ─► home
 ```
 
 Descanso runs beside this tree: `descanso` → `descanso-activo` →
@@ -328,7 +328,7 @@ sampleBreaks(): { id; minutes; realMinutes; date }[];
 5. Sami picks Calma, taps "Seguir" → `alternativa` with time preselected →
    "Igual quiero entrar" → `entrando` (1 s) → `feed`.
 6. Sami taps X → exit sheet → picks an emotion → `saveCurrentEntry()` →
-   `cierre` for 1.5 s → `home` (7.2, 1.3).
+   `cierre` for 3 s → `home` (7.2, 1.3).
 
 **Scenario B — start and end a break early (Req 5):**
 

@@ -8,7 +8,7 @@ window.PILAS_DATA = (function () {
     { id: "aburrimiento", label: "Aburrimiento", bg: "#C28CAE", fill: "#A86F93", pause: "Llegas aburrido. ¿Qué buscas?" },
   ];
 
-  // Tiempo de la pantalla 8: tres tiempos + "Indefinido" (minutes: null = sin aviso de tiempo).
+  // Tiempos de las alternativas: tres + "Indefinido" (minutes: null = sin aviso de tiempo).
   // "Ahora no" del check-in también entra sin tiempo.
   const times = [
     { id: "5",     label: "5 min",      minutes: 5 },
@@ -17,7 +17,7 @@ window.PILAS_DATA = (function () {
     { id: "indef", label: "Indefinido", minutes: null },
   ];
 
-  // Pantalla 8. PENDIENTE: reemplazar con lo que digan las entrevistas.
+  // PENDIENTE: reemplazar con lo que digan las entrevistas.
   const alternatives = {
     aburrimiento: ["Escribirle a alguien", "Poner una canción"],
     ansiedad: ["Respirar 1 minuto", "Escribir qué te preocupa"],
@@ -34,7 +34,7 @@ window.PILAS_DATA = (function () {
     { id: "pilas",    name: "PILAS",    icon: null,       social: false, color: "#FBF8F1", isPilas: true },
   ];
 
-  // Pantalla 13/14: grupo de amigos. `color` es el color del avatar, uno distinto por persona (paleta del
+  // Grupo de amigos. `color` es el color del avatar, uno distinto por persona (paleta del
   // design system; no es un juicio, solo el color que le tocó). El avatar lleva su inicial.
   // bigText: el morado da 4.4:1 con ink, así que su inicial va en 18px / 700.
   // El tiempo de uso solo se muestra en la fila propia (timeLabel/weekLabel): el de los demás no se ve.
@@ -63,7 +63,7 @@ window.PILAS_DATA = (function () {
   // PENDIENTE: sugerencias de "Proponer un reto", provisionales hasta validar con el grupo.
   const challengeSuggestions = ["Nada de redes al despertar", "Una tarde sin celular"];
 
-  // Pantalla 10b: nota de un amigo antes de abrir una red. No ve si entras, cuánto tiempo ni cómo te sientes.
+  // Nota de un amigo antes de abrir una red. No ve si entras, cuánto tiempo ni cómo te sientes.
   const friendNotes = [
     { id: "n1", from: "vale", message: "Ey ey, ¡pilas con el cel!" },
     { id: "n2", from: "juan", message: "Te dibujé esto, no te rías.", drawing: true },
@@ -100,7 +100,7 @@ window.PILAS_DATA = (function () {
     { label: "Tu meta de foco del mes", pct: 60 },
   ];
 
-  // 2 descansos de ejemplo para que "Tus descansos" no se vea vacío en el pitch
+  // 2 descansos de ejemplo para el historial
   function sampleBreaks() {
     const today = new Date();
     const at = (h, m) => { const d = new Date(today); d.setHours(h, m, 0, 0); return d.toISOString(); };
@@ -110,7 +110,7 @@ window.PILAS_DATA = (function () {
     ];
   }
 
-  // Pantalla 15 (Yo): metas del mes, elegidas por Sami. Sin niveles ni comparación con nadie más.
+  // Yo: metas del mes, elegidas por Sami. Sin niveles ni comparación con nadie más.
   const goals = [
     { id: "foco",     title: "30 h de foco en el mes",                    current: 18, target: 30, unit: "h" },
     { id: "nocturno", title: "Noches sin redes después de las 11 pm",     current: 9,  target: 20, unit: "noches" },
@@ -128,10 +128,10 @@ window.PILAS_DATA = (function () {
     { icon: "message-circle", text: "Le escribiste a Vale" },
   ];
 
-  // Tarjeta protagonista de Yo: horas de foco + comparación de emociones sin juicio (design-system §6).
+  // Tarjeta protagonista de Yo: horas de foco + comparación de emociones sin juicio.
   const focus = { current: 18, target: 30, since: "marzo", emoNote: "Llegaste más veces con calma que con ansiedad." };
 
-  // 2 entradas de ejemplo para que la pantalla 13 no se vea vacía en el pitch
+  // 2 entradas de ejemplo: preseleccionan el tiempo de las alternativas (Hoy ya no las lista)
   function sampleEntries() {
     const today = new Date();
     const at = (h, m) => { const d = new Date(today); d.setHours(h, m, 0, 0); return d.toISOString(); };

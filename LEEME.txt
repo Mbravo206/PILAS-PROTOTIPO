@@ -8,9 +8,12 @@ COMO ABRIRLO
 3. En celular: abrir el mismo index.html; ocupa toda la pantalla.
 
 QUE PROBAR
-Tocar Instagram o TikTok -> elegir como llegas -> a que vas y cuanto tiempo ->
-esperar el aviso -> salir -> como sales -> inicio.
-"Reiniciar prototipo" en la pantalla de inicio borra los datos.
+Tocar Instagram o TikTok en el celular simulado -> (si hay nota de un amigo, responder o entrar)
+-> elegir como te sientes -> elegir otra cosa o el tiempo (o "Indefinido") -> feed -> salir con la X
+-> como te sientes despues -> mensaje de cierre -> vuelve al celular.
+El icono de PILAS del celular abre Hoy, con Grupo, Descanso y Yo en la barra de abajo.
+"Reiniciar prototipo" (en Hoy) borra los datos.
+Tambien esta publicado en https://pilas-prototipo.vercel.app
 
 CREDITOS
 Rubik (SIL OFL 1.1), Lucide (ISC), Tailwind CSS (MIT). Detalle en docs/creditos.md.

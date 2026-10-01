@@ -8,12 +8,16 @@ Grupo 7 · Diseño Interactivo UJTL
 - En celular: abrir el mismo archivo; ocupa la pantalla completa.
 
 ## Flujo
-Home simulado → ¿Cómo llegas? → ¿A qué vas? → (Otra opción) → Entrando → Feed → Aviso → (Te pasaste) → ¿Cómo sales? → Inicio
+Celular simulado → (aviso de descanso o reto) → (nota de un amigo) → ¿Cómo te sientes? → ¿Y si pruebas otra cosa primero? + tiempo → Feed → (aviso o te pasaste) → ¿Cómo te sientes después? → Cierre → Celular
+
+El ícono de PILAS del celular abre **Hoy** (con Grupo, Descanso y Yo en la barra inferior).
+
+Publicado en https://pilas-prototipo.vercel.app (cada push a `main` lo actualiza).
 
 ## Editar
 | Quiero cambiar... | Archivo |
 |---|---|
-| Emociones, intenciones, tiempos, alternativas | `js/data.js` |
+| Emociones, tiempos, alternativas, grupo, retos y mensajes | `js/data.js` |
 | Colores, tipografía, espaciado | `js/tailwind.config.js` |
 | Botones, chips, tarjetas, personaje | `js/ui.js` |
 | Pantallas y lógica | `js/app.js` |
@@ -27,6 +31,7 @@ npm run build:css  # regenera css/tailwind.css
 
 ## Documentación
 - `docs/spec.md` — qué se construye, estado, pantallas, reglas, decisiones pendientes
+- `docs/specs/` — specs de feature (requirements.md y design.md)
 - `docs/design-system.md` — tokens, componentes, voz
 - `docs/pantallas.md` — objetivo y copy de cada pantalla
 - `SPEC.md` — rumbo, decisiones cerradas y criterios G1–G8
