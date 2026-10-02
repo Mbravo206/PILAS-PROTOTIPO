@@ -7,4 +7,4 @@
 | Tailwind CSS v3 | Tailwind Labs | MIT | `css/tailwind.css`, Play CDN en desarrollo |
 | Personajes (blobs por emoción) | Grupo 7 (propio) | Propio | `js/ui.js → character()` |
 | Ícono de la app PILAS (SVG del Figma del grupo) | Grupo 7 (propio) | Propio | `js/ui.js → pilasIcon()`, pantalla 0 |
-| Iconos del home simulado (Instagram, TikTok: solo el nombre; ícono propio sobre Lucide, sin logos de marca) | Grupo 7 (propio, sobre Lucide) | Propio / ISC | Pantalla 0 |
+| Logos de Instagram y TikTok (SVG simplificados, redibujados por el grupo; marcas de sus respectivos dueños, uso solo ilustrativo en un prototipo académico) | Grupo 7 | Propio / marcas de terceros | `assets/logos/`, pantalla 0 y Yo → Redes con pausa |

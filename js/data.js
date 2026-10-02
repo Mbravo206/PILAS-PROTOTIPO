@@ -24,13 +24,13 @@ window.PILAS_DATA = (function () {
     default: ["Escribirle a alguien", "Respirar 1 minuto"],
   };
 
-  // Home simulado (mínimo): solo las redes con pausa + PILAS. Íconos genéricos, nunca logos reales.
+  // Home simulado (mínimo): solo las redes con pausa + PILAS. Instagram y TikTok llevan su logo (campo `logo`); el resto, ícono genérico.
   // La lista de Yo → "Redes con pausa" sale de aquí: solo Instagram y TikTok, con la pausa encendida.
   // En producción esta pantalla sería un Accessibility Service (Android) o Screen Time
   // (iOS): aquí solo se demuestra la intercepción, no reemplaza el celular real.
   const apps = [
-    { id: "fotogram", name: "Instagram", icon: "aperture", social: true,  color: "#6698CC" },
-    { id: "clipz",    name: "TikTok",   icon: "music",    social: true,  color: "#FFEC89" },
+    { id: "fotogram", name: "Instagram", icon: "aperture", logo: "assets/logos/instagram.svg", social: true,  color: "#6698CC" },
+    { id: "clipz",    name: "TikTok",   icon: "music",    logo: "assets/logos/tiktok.svg",    social: true,  color: "#FFEC89" },
     { id: "pilas",    name: "PILAS",    icon: null,       social: false, color: "#FBF8F1", isPilas: true },
   ];
 

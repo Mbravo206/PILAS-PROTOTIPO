@@ -150,7 +150,9 @@
     home() {
       const tile = (a) => a.isPilas
         ? pilasIcon(64)
-        : `<span class="w-16 h-16 rounded-[22.5%] inline-flex items-center justify-center" style="background:${a.color}">
+        : a.logo
+          ? `<img src="${a.logo}" alt="" class="w-16 h-16 rounded-[22.5%]">`
+          : `<span class="w-16 h-16 rounded-[22.5%] inline-flex items-center justify-center" style="background:${a.color}">
             <i data-lucide="${a.icon}" class="w-7 h-7" style="color:#1F2240" stroke-width="1.5"></i>
           </span>`;
       const socialApps = D.apps.filter((a) => a.social && state.pausedApps[a.id]);
@@ -506,8 +508,10 @@
       const socialApps = D.apps.filter((a) => a.social);
       const appToggles = socialApps.map((a) => `
         <div class="min-h-[56px] flex items-center gap-md py-sm border-b border-line last:border-0">
-          <span class="w-9 h-9 rounded-input inline-flex items-center justify-center" style="background:${a.color}">
-            <i data-lucide="${a.icon}" class="w-5 h-5" style="color:#1F2240" stroke-width="1.5"></i></span>
+          ${a.logo
+            ? `<img src="${a.logo}" alt="" class="w-9 h-9 rounded-input">`
+            : `<span class="w-9 h-9 rounded-input inline-flex items-center justify-center" style="background:${a.color}">
+            <i data-lucide="${a.icon}" class="w-5 h-5" style="color:#1F2240" stroke-width="1.5"></i></span>`}
           <span class="flex-1 text-label text-ink">${a.name}</span>
           ${toggle(!!state.pausedApps[a.id], { action: "toggle-app-pause", value: a.id, ariaLabel: `Pausa antes de abrir ${a.name}` })}
         </div>`).join("");
