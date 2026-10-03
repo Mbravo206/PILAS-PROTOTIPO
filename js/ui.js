@@ -50,13 +50,13 @@ window.UI = (function () {
 
   // Personaje · blob por emoción, con cara: ojos + boca que cambia según cómo llega/sale.
   // face: "minima" (ojos + boca) | "ninguna" (blob liso). "Tocar personaje" lo hace parpadear (css .blink).
-  function character(emotionId, size = 64, face = "minima") {
+  function character(emotionId, size = 64, face = "minima", extraClass = "") {
     const fill = EMO[emotionId]?.fill || "#4C57A9";
     const mouth = MOUTHS[emotionId] || MOUTHS.default;
     const face_ = face === "minima"
       ? `<circle cx="38" cy="46" r="5" fill="#1F2240"/><circle cx="62" cy="46" r="5" fill="#1F2240"/>${mouth}`
       : "";
-    return `<svg class="character" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true">
+    return `<svg class="character ${extraClass}" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true">
       <path d="M50 8c24 0 40 17 40 41S74 92 50 92 10 73 10 49 26 8 50 8z" fill="${fill}"/>${face_}</svg>`;
   }
 
@@ -85,7 +85,7 @@ window.UI = (function () {
     const layout = compact ? "min-h-[64px] flex-row items-center gap-sm p-sm" : "min-h-[112px] flex-col items-start justify-between p-md";
     return `<button type="button" class="emotion-card w-full rounded-card border-2 ${ring} flex ${layout} text-left text-ink transition duration-200 ease-out active:scale-[0.98]"
       style="background:${e.bg}" aria-pressed="${selected}" ${attrs(action, e.id)}>
-      <span class="${selected ? "pop" : ""} inline-flex items-center justify-center rounded-full bg-surface shrink-0 ${compact ? "w-10 h-10" : "w-12 h-12"}">${character(e.id, compact ? 30 : 36)}</span>
+      <span class="${selected ? "pop" : ""} inline-flex items-center justify-center rounded-full bg-surface shrink-0 ${compact ? "w-10 h-10" : "w-12 h-12"}">${character(e.id, compact ? 30 : 36, "minima", selected ? "react-" + e.id : "")}</span>
       <span class="${text} min-w-0">${e.label}</span></button>`;
   }
 
@@ -118,6 +118,21 @@ window.UI = (function () {
       <path d="M50 64v30" stroke="#1F2240" stroke-width="4" stroke-linecap="round" fill="none"/>
       <path d="M50 82q-16-2-20-14 14-2 20 14z" fill="#6698CC" stroke="#1F2240" stroke-width="3" stroke-linejoin="round"/>
       ${petals}<circle cx="50" cy="46" r="10" fill="#FFEC89" stroke="#1F2240" stroke-width="3"/></svg>`;
+  }
+
+  // Dibujo de Juan ("no te rías"): trazo torpe a mano alzada sobre una hoja. Autorretrato con pelo de pinchos y el sol.
+  function drawing(width = 240) {
+    return `<svg width="${width}" viewBox="0 0 240 200" role="img" aria-label="Dibujo de Juan: una cara sonriente con el pelo parado y un sol">
+      <rect x="2" y="2" width="236" height="196" rx="6" fill="#FFFFFF" stroke="#E4E0EF" stroke-width="2"/>
+      <circle cx="198" cy="40" r="17" fill="#FFEC89" stroke="#1F2240" stroke-width="3"/>
+      <g stroke="#1F2240" stroke-width="3" stroke-linecap="round"><path d="M198 12v-6M198 74v-6M170 40h-6M232 40h-6M178 20l-4-4M218 60l4 4M218 20l4-4M178 60l-4 4"/></g>
+      <path d="M62 62l-8-24 18 14 6-26 14 22 12-24 6 26 16-16-4 28" fill="none" stroke="#1F2240" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M60 66q-8 46 6 74 14 26 46 24 32-2 44-28 10-26-2-68-30-14-94-2z" fill="#FFAD33" stroke="#1F2240" stroke-width="3.4" stroke-linejoin="round"/>
+      <circle cx="92" cy="104" r="6" fill="#1F2240"/><circle cx="130" cy="102" r="9" fill="#1F2240"/>
+      <path d="M86 128q22 26 52 0" fill="none" stroke="#1F2240" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M118 140q4 14 14 8" fill="#C28CAE" stroke="#1F2240" stroke-width="3" stroke-linecap="round"/>
+      <path d="M40 182q50-10 160 0" fill="none" stroke="#6BAA75" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
   }
 
   // Etiqueta informativa (no interactiva): borde line, texto caption. P. ej. "En el reto"
@@ -156,5 +171,5 @@ window.UI = (function () {
     </div>`;
   }
 
-  return { button, textButton, iconButton, character, chip, emotionCard, emotionDot, avatar, personAvatar, flower, tag, toggle, pilasIcon };
+  return { button, textButton, iconButton, character, chip, emotionCard, emotionDot, avatar, personAvatar, flower, drawing, tag, toggle, pilasIcon };
 })();

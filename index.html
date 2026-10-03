@@ -4,6 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>PILAS · Prototipo vertical</title>
+  <meta name="description" content="Abre tus redes con intención y sal sin culpa." />
+
+  <!-- Logo en la pestaña y vista previa del link (WhatsApp, Instagram, etc.) -->
+  <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg" />
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png" />
+  <meta property="og:title" content="PILAS" />
+  <meta property="og:description" content="Abre tus redes con intención y sal sin culpa." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://pilas-prototipo.vercel.app/assets/brand/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
 
   <!-- Estilos offline: Tailwind ya compilado con los tokens PILAS (regenerar con tools/ → npm run build:css) -->
   <link rel="stylesheet" href="css/tailwind.css" />
@@ -28,22 +38,22 @@
     </header>
 
     <!-- Cada pantalla es una <section>. js/app.js renderiza su contenido y muestra solo la activa. -->
-    <section class="screen" data-screen="inicio"             aria-label="13. Hoy (entrada real de PILAS)"></section>
-    <section class="screen" data-screen="home"               aria-label="0. Celular simulado (demo)" hidden></section>
-    <section class="screen" data-screen="nota"               aria-label="10b. Nota de un amigo" hidden></section>
+    <section class="screen" data-screen="inicio"             aria-label="Hoy (entrada real de PILAS)"></section>
+    <section class="screen" data-screen="home"               aria-label="Celular simulado (demo)" hidden></section>
+    <section class="screen" data-screen="nota"               aria-label="Nota de un amigo" hidden></section>
     <section class="screen" data-screen="responder"          aria-label="Responder al amigo" hidden></section>
-    <section class="screen" data-screen="alternativa"        aria-label="8. Otra opción" hidden></section>
-    <section class="screen" data-screen="alternativa-hecha"  aria-label="8b. Actividad elegida" hidden></section>
-    <section class="screen" data-screen="entrando"           aria-label="9. Entrando" hidden></section>
+    <section class="screen" data-screen="alternativa"        aria-label="Otra opción" hidden></section>
+    <section class="screen" data-screen="alternativa-hecha"  aria-label="Actividad elegida" hidden></section>
+    <section class="screen" data-screen="entrando"           aria-label="Entrando" hidden></section>
     <section class="screen" data-screen="feed"               aria-label="Feed simulado" hidden></section>
-    <section class="screen" data-screen="pasaste"            aria-label="12. Te pasaste" hidden></section>
-    <section class="screen" data-screen="cierre"             aria-label="11b. Mensaje de cierre" hidden></section>
-    <section class="screen" data-screen="grupo"               aria-label="14. Tu grupo" hidden></section>
+    <section class="screen" data-screen="pasaste"            aria-label="Te pasaste" hidden></section>
+    <section class="screen" data-screen="cierre"             aria-label="Mensaje de cierre" hidden></section>
+    <section class="screen" data-screen="grupo"               aria-label="Tu grupo" hidden></section>
     <section class="screen" data-screen="descanso"           aria-label="Descanso" hidden></section>
     <section class="screen" data-screen="descanso-activo"    aria-label="Descanso activo" hidden></section>
     <section class="screen" data-screen="descanso-fin"       aria-label="Descanso fin" hidden></section>
     <section class="screen" data-screen="dejarmensaje"       aria-label="Dejarle algo a un amigo" hidden></section>
-    <section class="screen" data-screen="yo"                 aria-label="15. Yo" hidden></section>
+    <section class="screen" data-screen="yo"                 aria-label="Yo" hidden></section>
 
     <!-- Hoja inferior: avisos, check-in, salida y selectores. app.js rellena su contenido -->
     <div id="sheet-layer" class="absolute inset-0 z-20" hidden>

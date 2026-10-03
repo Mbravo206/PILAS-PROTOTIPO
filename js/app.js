@@ -2,7 +2,7 @@
 // Flujo: celular simulado (home) → aviso o nota → check-in → alternativas y tiempo → feed → salida → cierre → home.
 (function () {
   const D = window.PILAS_DATA;
-  const { button, textButton, iconButton, character, chip, emotionCard, emotionDot, avatar, personAvatar, flower, toggle, pilasIcon } = window.UI;
+  const { button, textButton, iconButton, character, chip, emotionCard, emotionDot, avatar, personAvatar, flower, drawing, toggle, pilasIcon } = window.UI;
 
   // ---------- Modo demo: 1 min elegido = 5 s reales ----------
   let demo = new URLSearchParams(location.search).get("demo") === "1";
@@ -105,6 +105,8 @@
 
   // ---------- Router ----------
   const $ = (sel) => document.querySelector(sel);
+  // Texto escrito por la persona: se escapa antes de ir dentro de un atributo HTML.
+  const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const screenEl = (name) => document.querySelector(`[data-screen="${name}"]`);
 
   function go(name, { soft = false } = {}) {
@@ -116,6 +118,12 @@
     if (window.lucide) lucide.createIcons();
     if (soft) return; // re-render por selección: sin animación, sin mover el foco
     void el.offsetWidth; el.classList.add("enter");
+    // Entrada escalonada (60 ms entre bloques, máx. 8): solo al llegar a una pantalla tras un toque.
+    el.querySelectorAll(".screen-body > *").forEach((n, i) => {
+      if (i > 7) return;
+      n.style.animationDelay = `${i * 60}ms`;
+      n.classList.add("up");
+    });
     el.querySelector("h1")?.focus({ preventScroll: true });
     onEnter[name]?.();
   }
@@ -187,7 +195,7 @@
             <p class="text-label text-ink">${friend.name} te dejó algo antes de entrar</p>
           </div>
           <h1 tabindex="-1" class="text-title-lg text-ink outline-none mt-md">${n.message}</h1>
-          ${n.drawing ? `<div class="bg-surface rounded-card border border-line p-md mt-lg mx-auto"><p class="text-caption text-ink-soft">Te mandó un dibujo</p></div>` : ""}
+          ${n.drawing ? `<div class="bg-surface rounded-card border border-line p-md mt-lg mx-auto">${drawing(240)}<p class="text-caption text-ink-soft mt-sm">${friend.name} te mandó un dibujo</p></div>` : ""}
           ${n.gift === "flor" ? `<div class="bg-surface rounded-card border border-line p-md mt-lg mx-auto flex flex-col items-center gap-xs">${flower(96)}<p class="text-caption text-ink-soft">${friend.name} te mandó una flor</p></div>` : ""}
           ${state.replySent ? `<p class="text-label text-ink mt-lg">Le respondiste a ${friend.name}: ${sentReplyText()}.</p>` : ""}
           <p class="text-label text-ink-soft mt-lg">${friend.name} no ve si entras, cuánto tiempo ni cómo te sientes.</p>
@@ -275,22 +283,58 @@
         </div>`;
     },
 
-    // Feed simulado (placeholders)
+    // Feed simulado: Instagram (historias + fotos 4:5) y TikTok (una publicación por pantalla). Todo ficticio.
     feed() {
+      const isTikTok = state.app === "clipz";
       const app = D.APP[state.app]?.name || "Red";
-      const posts = Array.from({ length: 8 }, (_, n) => `
-        <article class="bg-surface rounded-card border border-line p-md">
-          <div class="flex items-center gap-sm"><span class="w-9 h-9 rounded-full bg-line"></span><span class="h-3 w-28 rounded-full bg-line"></span></div>
-          <div class="mt-md rounded-input bg-line" style="height:${n % 2 ? 180 : 260}px"></div>
-          <div class="mt-md h-3 w-3/4 rounded-full bg-line"></div>
+      const logo = D.APP[state.app]?.logo ? `<img src="${D.APP[state.app].logo}" alt="" class="w-7 h-7 rounded-[22.5%]">` : "";
+      const dot = (p, size = 32) => `<span class="inline-flex items-center justify-center rounded-full border border-line shrink-0 font-bold text-ink select-none" style="width:${size}px;height:${size}px;background:${p.color};font-size:${Math.round(size * 0.45)}px;line-height:1" aria-hidden="true">${p.user[0].toUpperCase()}</span>`;
+      const top = `
+        <div class="px-md py-sm flex items-center justify-between border-b border-line bg-background">
+          <span class="flex items-center gap-sm text-title-md text-ink">${logo}${app}</span>
+          ${iconButton("x", `Salir de ${app}`, "feed-exit")}
+        </div>`;
+
+      if (isTikTok) {
+        const side = (icon, n) => `<span class="flex flex-col items-center gap-xs"><span class="w-11 h-11 rounded-full bg-surface inline-flex items-center justify-center"><i data-lucide="${icon}" class="w-5 h-5 text-ink" stroke-width="1.5" aria-hidden="true"></i></span><span class="text-caption text-ink bg-surface/90 rounded-full px-xs">${n}</span></span>`;
+        const clips = D.feedPosts.map((p, i) => `
+          <article class="relative h-full shrink-0 snap-start overflow-hidden bg-line">
+            <img src="${p.image}" alt="${p.caption}" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
+            <div class="absolute right-md bottom-xl flex flex-col gap-md">${side("heart", p.likes)}${side("message-circle", 48 + i * 17)}${side("share-2", "Enviar")}</div>
+            <div class="absolute left-md right-[84px] bottom-md bg-surface/90 rounded-card p-md">
+              <p class="flex items-center gap-sm text-label text-ink">${dot(p, 28)}@${p.user}</p>
+              <p class="text-caption text-ink mt-xs">${p.caption}</p>
+              <p class="flex items-center gap-xs text-caption text-ink-soft mt-xs"><i data-lucide="music" class="w-4 h-4" stroke-width="1.5" aria-hidden="true"></i>sonido original</p>
+            </div>
+          </article>`).join("");
+        return `<div class="h-full flex flex-col bg-background">${top}<div class="screen-body snap-y snap-mandatory flex flex-col">${clips}</div></div>`;
+      }
+
+      const stories = D.group.filter((m) => !m.self).slice(0, 5).map((m) => `
+        <span class="flex flex-col items-center gap-xs shrink-0">
+          <span class="p-[3px] rounded-full" style="background:linear-gradient(135deg,#FFAD33,#C28CAE,#6698CC)">
+            <span class="block p-[2px] rounded-full bg-background">${personAvatar(m, 52)}</span></span>
+          <span class="text-caption text-ink">${m.name}</span>
+        </span>`).join("");
+      const posts = D.feedPosts.map((p) => `
+        <article class="shrink-0 bg-surface rounded-card border border-line overflow-hidden">
+          <div class="flex items-center gap-sm p-md">${dot(p)}<span class="text-label text-ink">${p.user}</span></div>
+          <img src="${p.image}" alt="${p.caption}" class="w-full aspect-[4/5] object-cover bg-line" loading="lazy">
+          <div class="px-md pt-md flex items-center gap-md">
+            <i data-lucide="heart" class="w-6 h-6 text-ink" stroke-width="1.5" aria-hidden="true"></i>
+            <i data-lucide="message-circle" class="w-6 h-6 text-ink" stroke-width="1.5" aria-hidden="true"></i>
+            <i data-lucide="send" class="w-6 h-6 text-ink" stroke-width="1.5" aria-hidden="true"></i>
+            <i data-lucide="bookmark" class="w-6 h-6 text-ink ml-auto" stroke-width="1.5" aria-hidden="true"></i>
+          </div>
+          <p class="px-md pt-sm text-label text-ink">${p.likes} Me gusta</p>
+          <p class="px-md pt-xs pb-md text-label text-ink"><span class="font-medium">${p.user}</span> ${p.caption}</p>
         </article>`).join("");
       return `
-        <div class="h-full flex flex-col bg-background">
-          <div class="px-md py-sm flex items-center justify-between border-b border-line">
-            <span class="text-title-md text-ink">${app}</span>
-            ${iconButton("x", `Salir de ${app}`, "feed-exit")}
+        <div class="h-full flex flex-col bg-background">${top}
+          <div class="screen-body px-md py-md flex flex-col gap-md">
+            <div class="shrink-0 flex gap-md overflow-x-auto pb-xs" aria-label="Historias">${stories}</div>
+            ${posts}
           </div>
-          <div class="screen-body px-md py-md flex flex-col gap-md">${posts}</div>
         </div>`;
     },
 
@@ -383,7 +427,7 @@
           <div class="screen-body px-lg pt-lg">
             <h1 tabindex="-1" class="text-title-lg text-ink outline-none">Tu grupo</h1>
             <p class="text-body text-ink-soft mt-xs">Los del colegio</p>
-            <ul class="mt-lg flex flex-col gap-sm">${groupRows(D.group)}</ul>
+            <ul class="mt-lg bg-surface rounded-card border border-line px-md">${groupRows(D.group)}</ul>
             <p class="text-caption text-ink-soft mt-sm">Aquí solo ves quién está en el reto. Tu tiempo lo ves solo tú.</p>
 
             <h2 class="text-title-md text-ink mt-xl">Los premiados de hoy</h2>
@@ -479,7 +523,7 @@
           <div class="flex flex-wrap gap-sm mt-sm">${sugChips}</div>
           <h2 class="text-title-md text-ink mt-xl">O escribe el tuyo</h2>
           <input type="text" class="w-full h-[52px] px-md rounded-input border-2 border-line bg-surface text-body text-ink mt-sm"
-            placeholder="Escribe algo corto" value="${state.noteDraft.custom}" data-action="note-type" aria-label="Escribe tu propio mensaje" />`,
+            placeholder="Escribe algo corto" value="${esc(state.noteDraft.custom)}" data-action="note-type" aria-label="Escribe tu propio mensaje" />`,
         actions:
           button("Enviar mensaje", { action: "note-send", disabled: !canSend }) +
           button("Volver", { variant: "secondary", action: "note-back" }),
@@ -611,9 +655,9 @@
     return `
       <div class="flex items-center justify-between">
         <h2 class="text-title-md text-ink">Tu grupo</h2>
-        <button type="button" class="hit-44 relative inline-flex items-center gap-xs text-label text-ink transition duration-200 ease-out active:opacity-70" data-action="go-grupo">Ver grupo<i data-lucide="chevron-right" class="w-4 h-4" stroke-width="2" aria-hidden="true"></i></button>
+        <button type="button" class="hit-44 relative text-label text-primary transition duration-200 ease-out active:text-primary-pressed" data-action="go-grupo">Los del colegio</button>
       </div>
-      <ul class="mt-sm flex flex-col gap-sm">${groupRows(D.group.slice(0, 4))}</ul>`;
+      <ul class="mt-sm bg-surface rounded-card border border-line px-md">${groupRows(D.group.slice(0, 4))}</ul>`;
   }
 
   // Estado de cada persona frente a los retos: "cumplio" | "enCurso" | null. Sin puntos ni ranking.
@@ -629,27 +673,21 @@
     if (!status) return "";
     const done = status === "cumplio";
     return `<span class="inline-flex items-center gap-xs px-sm h-7 rounded-full bg-line/60 text-caption text-ink shrink-0">
-      ${done ? `<i data-lucide="check" class="w-4 h-4" stroke-width="2" aria-hidden="true"></i>` : ""}${done ? "Cumplió" : "En curso"}</span>`;
+      ${done ? `<i data-lucide="check" class="draw-check w-4 h-4" stroke-width="2" aria-hidden="true"></i>` : ""}${done ? "Cumplió" : "En curso"}</span>`;
   }
 
-  // Filas de "Tu grupo": estilo ranking pero sin ranking (sin números, sin orden, sin puntos).
-  // La carita al frente solo describe el estado del reto; los tiempos ajenos nunca se muestran.
+  // Filas de "Tu grupo": solo si cada quien está en el reto o lo cumplió, sin tiempos de los demás.
   // El tiempo propio es opcional y privado: solo aparece en la fila de Sami si comparte el ajuste.
   function groupRows(members) {
-    return members.map((m) => {
-      const status = retoStatus(m);
-      const face = status === "cumplio" ? "laugh" : "smile";
-      return `
-      <li class="min-h-[64px] flex items-center gap-md px-md py-sm rounded-input ${m.self ? "bg-primary/20" : "bg-surface border border-line"}">
-        <i data-lucide="${face}" class="w-6 h-6 shrink-0 ${status ? "text-ink" : "text-ink-soft"}" stroke-width="1.5" aria-hidden="true"></i>
+    return members.map((m) => `
+      <li class="min-h-[56px] flex items-center gap-md py-sm border-b border-line last:border-0">
         ${personAvatar(m, 36)}
         <span class="flex-1">
           <span class="block text-label text-ink">${m.name}${m.self ? ` <span class="text-caption text-ink-soft">Tú</span>` : ""}</span>
           ${m.self && state.settings.shareTime ? `<span class="block text-caption text-ink-soft">Hoy ${m.timeLabel} · solo tú lo ves</span>` : ""}
         </span>
-        ${retoChip(status)}
-      </li>`;
-    }).join("");
+        ${retoChip(retoStatus(m))}
+      </li>`).join("");
   }
 
   // Retos activos: cada uno con su propia adhesión
@@ -686,7 +724,7 @@
     return `
       <div class="flex items-center justify-between gap-sm">
         <span class="inline-flex items-center gap-xs px-md h-9 rounded-full bg-line/60 text-label text-ink">
-          <i data-lucide="check" class="w-4 h-4" stroke-width="2" aria-hidden="true"></i>${onLabel}</span>
+          <i data-lucide="check" class="draw-check w-4 h-4" stroke-width="2" aria-hidden="true"></i>${onLabel}</span>
         <button type="button" class="hit-44 relative text-caption text-ink underline underline-offset-2 transition duration-200 ease-out active:opacity-70"
           data-action="toggle-challenge" data-value="${id}">Salir del reto</button>
       </div>`;
@@ -697,16 +735,16 @@
     const rows = D.rewarded.map((r) => {
       const m = D.GROUP[r.id];
       return `
-        <li class="min-h-[64px] flex items-center gap-md p-sm bg-surface rounded-input border border-line">
+        <li class="min-h-[64px] flex items-center gap-md py-sm border-b border-line last:border-0">
           ${personAvatar(m, 40)}
           <span class="flex-1">
             <span class="block text-label text-ink">${m.name}</span>
             <span class="block text-caption text-ink-soft">${r.note}</span>
           </span>
-          <i data-lucide="party-popper" class="w-6 h-6 text-ink-soft shrink-0" stroke-width="1.5" aria-hidden="true"></i>
+          <i data-lucide="sparkles" class="w-5 h-5 text-primary shrink-0" stroke-width="1.5" aria-hidden="true"></i>
         </li>`;
     }).join("");
-    return `<ul class="bg-primary/20 rounded-card p-sm flex flex-col gap-sm">${rows}</ul>
+    return `<ul class="bg-surface rounded-card border border-line px-md">${rows}</ul>
       <p class="text-caption text-ink-soft mt-sm">Sin puntos ni ranking: es solo para celebrarlos.</p>`;
   }
 
@@ -1014,6 +1052,13 @@
     const a = el.dataset.action;
     if (a === "statusbar") return tripleTap();
     actions[a]?.(el.dataset.value);
+  });
+
+  // Escape en la hoja inferior = tocar fuera de ella (cada hoja define esa acción en su fondo)
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Escape" || $("#sheet-layer").hidden) return;
+    const a = $("#sheet-layer .sheet-backdrop").dataset.action;
+    if (a) actions[a]?.();
   });
 
   // Texto libre de "Dejarle algo a un amigo": actualiza el estado y el botón sin

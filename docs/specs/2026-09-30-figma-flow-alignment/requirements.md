@@ -8,7 +8,7 @@
 
 The current prototype simulates the whole phone home screen (`renderers.home`)
 as its default, always-open entry point. The reference Figma prototype
-(`docs/figma/`, kept locally and not in the repository) instead treats PILAS as a real, installable app whose entry
+(`docs/figma/`) instead treats PILAS as a real, installable app whose entry
 point is its own "Hoy" screen — the phone-home mockup only exists to
 demonstrate, for grading purposes, what would be an OS-level interception
 (an Android Accessibility Service or iOS Screen Time hook) that HTML/CSS/JS

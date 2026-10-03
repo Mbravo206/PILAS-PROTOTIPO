@@ -93,3 +93,18 @@ test("los tokens del design system están en tailwind.config.js", () => {
   assert.equal(cfg.colors.state.error, "#CC1400");
   assert.ok(cfg.boxShadow.pilas);
 });
+
+test("cada emoción tiene su animación react-<id> en styles.css (y respeta reduced-motion)", () => {
+  const css = read("css/styles.css");
+  for (const e of D.emotions) assert.match(css, new RegExp("\\.react-" + e.id + "\\b"), e.id);
+  assert.match(css, /prefers-reduced-motion: reduce[\s\S]*animation: none/);
+});
+
+test("el texto escrito por la persona se escapa antes de ir en un atributo", () => {
+  assert.match(read("js/app.js"), /value="\$\{esc\(state\.noteDraft\.custom\)\}"/);
+});
+
+test("cada publicación del feed simulado tiene su imagen en assets/feed", () => {
+  assert.ok(D.feedPosts.length >= 4);
+  for (const p of D.feedPosts) assert.ok(fs.existsSync(path.join(root, p.image)), p.image);
+});

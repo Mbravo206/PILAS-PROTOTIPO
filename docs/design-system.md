@@ -91,7 +91,9 @@ Ejemplo: "Usas PILAS desde marzo" · "Llegaste más veces con calma que con ansi
 | Acción | Qué cambia | Reduced motion |
 |---|---|---|
 | Presionar | Escala 0.98 en todo elemento tocable (botón, chip, tarjeta, interruptor, ícono, pestaña del nav) + oscurece (`primary-pressed` o `brightness-95`) | Solo color |
-| Elegir emoción | Chip se llena; personaje 0.8 → 1 | Aparece sin escala |
+| Elegir emoción | Chip se llena; personaje 0.8 → 1. En las tarjetas de emoción el personaje reacciona (calma respira, alegría salta, ansiedad tiembla, aburrimiento se aplasta, tristeza se inclina). Única excepción a los 200ms: 380–900ms, solo justo tras el toque | Aparece sin movimiento |
+| Entrar a una pantalla | Los bloques del cuerpo suben 12px y aparecen, 60ms entre uno y otro (máx. 8) | Aparecen sin subir |
+| Check de estado ("Cumplió", reto unido) | El trazo se dibuja en 200ms | Check ya dibujado |
 | Guardar | "Guardando" → "Intención guardada" en tonal. Sin confeti | — |
 | Interruptor | Control se desliza 20px, pista a `primary` | Salta sin deslizar |
 | Tocar personaje | Parpadea una vez. Nunca solo | Sin parpadeo |
