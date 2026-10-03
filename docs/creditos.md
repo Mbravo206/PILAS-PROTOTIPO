@@ -8,3 +8,5 @@
 | Personajes (blobs por emoción) | Grupo 7 (propio) | Propio | `js/ui.js → character()` |
 | Ícono de la app PILAS (SVG del Figma del grupo) | Grupo 7 (propio) | Propio | `js/ui.js → pilasIcon()`, pantalla 0 |
 | Logos de Instagram y TikTok (SVG simplificados, redibujados por el grupo; marcas de sus respectivos dueños, uso solo ilustrativo en un prototipo académico) | Grupo 7 | Propio / marcas de terceros | `assets/logos/`, pantalla 0 y Yo → Redes con pausa |
+| Logo PILAS (favicon, apple-touch-icon y vista previa del link) | Grupo 7 (el mismo icono de `pilasIcon` en `js/ui.js`) | Propio | `assets/brand/` |
+| Ilustraciones del feed simulado de Instagram y TikTok (atardecer, gato, montañas, pastel, ciudad, flores) y el dibujo de Juan en la nota | Grupo 7 (dibujadas como SVG propios; cuentas y publicaciones ficticias) | Propio | `assets/feed/`, `js/ui.js → drawing()` |
