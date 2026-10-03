@@ -63,6 +63,16 @@ window.PILAS_DATA = (function () {
   // PENDIENTE: sugerencias de "Proponer un reto", provisionales hasta validar con el grupo.
   const challengeSuggestions = ["Nada de redes al despertar", "Una tarde sin celular"];
 
+  // Feed simulado de Instagram y TikTok: cuentas y fotos ficticias (ilustraciones propias en assets/feed/).
+  const feedPosts = [
+    { id: "p1", user: "atardeceres.co", color: "#FFAD33", image: "assets/feed/atardecer.svg", likes: "1.204", caption: "El mar a las seis de la tarde" },
+    { id: "p2", user: "gato_del_dia",   color: "#FFEC89", image: "assets/feed/gato.svg",      likes: "3.870", caption: "Te mira como si supiera algo" },
+    { id: "p3", user: "montaneros_",    color: "#6698CC", image: "assets/feed/montanas.svg",  likes: "902",   caption: "Subimos antes del amanecer" },
+    { id: "p4", user: "dulce.taller",   color: "#C28CAE", image: "assets/feed/pastel.svg",    likes: "2.115", caption: "Pastel de vainilla con cereza" },
+    { id: "p5", user: "luces.de.noche", color: "#967CC7", image: "assets/feed/ciudad.svg",    likes: "758",   caption: "La ciudad no se duerme" },
+    { id: "p6", user: "campo.abierto",  color: "#6BAA75", image: "assets/feed/flores.svg",    likes: "4.302", caption: "Sábado entre flores" },
+  ];
+
   // Nota de un amigo antes de abrir una red. No ve si entras, cuánto tiempo ni cómo te sientes.
   const friendNotes = [
     { id: "n1", from: "vale", message: "Ey ey, ¡pilas con el cel!" },
@@ -145,7 +155,7 @@ window.PILAS_DATA = (function () {
 
   return {
     emotions, times, alternatives, apps, group, challenges, challengeSuggestions, rewarded, breakStats,
-    friendNotes, friendReplies, replyDolls, noteSuggestions, breakTimes, breakSuggestion, sampleBreaks,
+    friendNotes, feedPosts, friendReplies, replyDolls, noteSuggestions, breakTimes, breakSuggestion, sampleBreaks,
     goals, goalSuggestions, achievements, focus, sampleEntries,
     EMO: byId(emotions), APP: byId(apps), GROUP: byId(group),
   };

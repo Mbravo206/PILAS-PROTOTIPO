@@ -4,6 +4,7 @@
   "description": "Solo para generar css/tailwind.css (versión offline) y correr las pruebas. El prototipo no necesita esto para abrir.",
   "scripts": {
     "test": "node --test smoke.test.js",
+    "sync": "node sync-ejecutable.js",
     "build:css": "cd .. && tailwindcss -c js/tailwind.config.js -i tools/input.css -o css/tailwind.css --minify",
     "watch:css": "cd .. && tailwindcss -c js/tailwind.config.js -i tools/input.css -o css/tailwind.css --watch"
   },

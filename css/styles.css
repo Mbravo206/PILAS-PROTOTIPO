@@ -28,6 +28,11 @@ body {
   flex-direction: column;
 }
 
+/* Laptops bajas: el celular se achica para caber entero en la ventana (sin scroll de la página) */
+@media (min-width: 501px) and (max-height: 900px) {
+  .phone { height: calc(100dvh - 40px); min-height: 560px; }
+}
+
 /* En celular real: pantalla completa, sin marco */
 @media (max-width: 500px) {
   body { display: block; background: #FBF8F1; }
@@ -59,6 +64,28 @@ body {
 /* Transición entre pantallas (solo opacidad) */
 .screen.enter { animation: fade 200ms ease-out; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Entrada escalonada: cada bloque sube 12px mientras aparece (el retraso lo pone go() en app.js) */
+.up { animation: up 200ms ease-out both; }
+@keyframes up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* Check que se dibuja (lucide ya lo pinta como <svg><path>; 24 > largo real del trazo) */
+.draw-check path { stroke-dasharray: 24; animation: draw 200ms ease-out 100ms backwards; }
+@keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+
+/* Reacciones del personaje al elegir su emoción (origen: los pies). Duran más de 200 ms a propósito:
+   solo ocurren justo después del toque y le dan carácter a cada emoción. */
+.character[class*="react-"] { transform-origin: 50% 100%; }
+.react-calma { animation: react-calma 900ms cubic-bezier(.4, 0, .2, 1); }
+.react-alegria { animation: react-alegria 520ms ease-out; }
+.react-ansiedad { animation: react-ansiedad 380ms linear; }
+.react-aburrimiento { animation: react-aburrimiento 760ms cubic-bezier(.4, 0, .2, 1); }
+.react-tristeza { animation: react-tristeza 760ms cubic-bezier(.4, 0, .2, 1); }
+@keyframes react-calma { 45% { transform: scale(1.06, 1.05); } }
+@keyframes react-alegria { 15% { transform: scale(1.08, .9); } 45% { transform: translateY(-16%) scale(.96, 1.05); } 75% { transform: scale(1.06, .93); } 100% { transform: none; } }
+@keyframes react-ansiedad { 20% { transform: translateX(-4%); } 40% { transform: translateX(4%); } 60% { transform: translateX(-3%); } 80% { transform: translateX(2%); } }
+@keyframes react-aburrimiento { 40% { transform: scale(1.05, .88); } 70% { transform: scale(1.02, .95); } }
+@keyframes react-tristeza { 40% { transform: translateY(5%) rotate(6deg); } 70% { transform: translateY(3%) rotate(4deg); } }
 
 /* Foco visible para teclado */
 :focus-visible { outline: 3px solid #4C57A9; outline-offset: 2px; }
