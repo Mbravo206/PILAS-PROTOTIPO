@@ -1,18 +1,16 @@
 # PILAS · Prototipo vertical
 
-Grupo 7 · Diseño Interactivo UJTL
+
 
 ## Abrir
 - Doble clic en `index.html`. Funciona sin servidor y sin internet.
-- **Modo demo** (1 min = 5 s): abrir `index.html?demo=1` o tocar 3 veces la barra de estado.
-- En celular: abrir el mismo archivo; ocupa la pantalla completa.
 
 ## Flujo
 Celular simulado → (aviso de descanso o reto) → (nota de un amigo) → ¿Cómo te sientes? → ¿Y si pruebas otra cosa primero? + tiempo → Feed → (aviso o te pasaste) → ¿Cómo te sientes después? → Cierre → Celular
 
-El ícono de PILAS del celular abre **Hoy** (con Grupo, Descanso y Yo en la barra inferior).
 
-Publicado en https://pilas-prototipo.vercel.app (cada push a `main` lo actualiza).
+
+Publicado en https://pilas-prototipo.vercel.app 
 
 ## Editar
 | Quiero cambiar... | Archivo |
@@ -38,4 +36,4 @@ npm run build:css  # regenera css/tailwind.css
 - `GUIA.md` — flujo de trabajo con Claude Code (spec-driven) y qué se guarda dónde
 - `CLAUDE.md` — stack, comandos de verificación y reglas para Claude Code
 - `docs/creditos.md` — licencias de assets
-- `docs/figma/` — PNG exportados de Figma, uno por pantalla (solo en el computador de quien los exporta; no se suben a GitHub)
+
