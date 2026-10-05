@@ -66,6 +66,7 @@ Desde `home`, el ícono PILAS abre **Hoy**. Hoy, Grupo, Descanso y Yo se navegan
 - **Mensajes de ejemplo:** "Ey ey, ¡pilas con el cel!" · "Te dibujé esto, no te rías." · "Te mandé esta flor para que te concentres."
 - **Acciones:** "Responderle" (oscuro) → responder · "Entrar igual" (texto plano) → check-in.
 - **Después de responder:** la misma nota muestra "Le respondiste a ‹Amigo›: …" y una sola acción, "Entrar a ‹red›".
+- **Si el contenido no cabe** (el dibujo de Juan, la flor o la respuesta enviada en una pantalla baja): el contenido hace scroll y los botones quedan fijos abajo, siempre a la vista. Nunca se pierde la salida "Entrar igual".
 
 ### responder · Responder al amigo
 - **Contenido:** el mensaje del amigo con su avatar, frases cortas ("¡Dale!", "¡Gracias!", "Jaja, listo") y muñequitos con carita: "Listo", "Lo pensaré", "Ahorita no puedo", "Te cuento luego".
