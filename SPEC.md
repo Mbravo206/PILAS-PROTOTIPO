@@ -110,3 +110,5 @@ Prototipo_Grupo7/
 ├── ejecutable/     # copia de index.html + css/ + js/ + assets/ (abre con doble clic)
 └── LEEME.txt       # cómo abrirlo, requisitos, créditos
 ```
+
+En el repositorio de GitHub solo se sube el contenido de `fuentes/` (por eso `index.html` está en la raíz); `ejecutable/` se entrega aparte y se genera con `npm run sync`.
