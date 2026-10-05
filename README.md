@@ -10,6 +10,19 @@ Prototipo móvil de **una sola tarea**: abrir una red social con intención y sa
 2. **Entender qué se construyó (5 min):** lee [`SPEC.md`](SPEC.md): el reto, el usuario, las decisiones y los criterios de aceptación G1 a G8.
 3. **Ver el código:** está en `js/`, con una pantalla por archivo en `js/screens/` (ver [Código](#código)). El mapa de todos los archivos está al inicio de `js/app.js`.
 
+## Qué hay en este repositorio
+
+Este repositorio es la carpeta `fuentes/` de la entrega, por eso `index.html` está en la raíz (ver [Estructura de la entrega](#estructura-de-la-entrega)). Qué es cada cosa:
+
+| Carpeta o archivo | Qué es |
+|---|---|
+| `index.html`, `css/`, `js/`, `assets/` | **La app.** Es lo que se publica en Vercel y lo que se abre con doble clic |
+| `SPEC.md` y `docs/` | Qué se construyó y por qué: spec, design system, pantallas, créditos y proceso de trabajo con IA |
+| `tools/` | Pruebas y compilación del CSS. No hace falta para abrir la app |
+| `CLAUDE.md` y `.claude/` | Reglas y herramientas de Claude Code usadas en el proceso (uso de IA declarado según la escala AIAS). `.claude/` solo está en GitHub |
+| `LEEME.txt` | Cómo abrirlo, en versión corta |
+| `.vercelignore` y `.gitignore` | Qué se publica en Vercel y qué no se sube a git |
+
 ## Flujo del prototipo
 
 Celular simulado → (aviso de descanso o reto) → (nota de un amigo) → ¿Cómo te sientes? → ¿Y si pruebas otra cosa primero? + tiempo → Feed → (aviso de tiempo) → ¿Cómo te sientes después? → Cierre → Celular
@@ -57,7 +70,7 @@ Desde `tools/` (la primera vez, `npm install`):
 
 ```bash
 npm run build:css   # regenera css/tailwind.css (necesario si agregas clases de Tailwind nuevas)
-npm run sync        # copia la app a ../ejecutable/ antes de entregar
+npm run sync        # copia la app a ../ejecutable/ antes de entregar (esa carpeta es de la entrega; no existe en GitHub)
 npm test            # pruebas automáticas de las reglas del design system
 ```
 
@@ -88,12 +101,16 @@ Las capturas de las pantallas de Figma se exportan a `docs/figma/` y son solo lo
 
 ## Estructura de la entrega
 
+La carpeta entregada tiene el código dos veces, como pide el enunciado (archivos fuente + ejecutable):
+
 ```
 Prototipo_Grupo7/
 ├── ejecutable/   # copia lista para abrir con doble clic (no se edita a mano)
-├── fuentes/      # esta carpeta: código, documentación y pruebas
+├── fuentes/      # código, documentación y pruebas: es lo que contiene este repositorio
 └── LEEME.txt     # cómo abrirlo (versión corta)
 ```
+
+**En GitHub solo está el contenido de `fuentes/`.** La carpeta `ejecutable/` no se sube: se genera con `npm run sync` y se entrega aparte, para abrir el prototipo sin ver el código. En este repositorio, `index.html` ya abre con doble clic.
 
 ## Créditos
 
