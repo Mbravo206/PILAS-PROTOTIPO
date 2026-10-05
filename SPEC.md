@@ -5,7 +5,7 @@
 **Estado:** Aprobado — 30 sep 2026 (D1 a D4 cerradas)
 
 Este documento orienta todo el trabajo. El detalle técnico está en
-`docs/spec.md`; el visual en `docs/design-system.md`; el copy y objetivo de
+`docs/spec-tecnico.md`; el visual en `docs/design-system.md`; el copy y objetivo de
 cada pantalla en `docs/pantallas.md`. Los specs de feature en `docs/specs/` se
 derivan de aquí y no pueden contradecirlo: si algo cambia, se cambia aquí primero.
 
@@ -41,12 +41,12 @@ antes de dormir. Padres/tutores: stakeholders, no aparecen en esta tarea.
 | ID | Decisión | Resultado |
 | --- | --- | --- |
 | D1 | Tarea a prototipar | Abrir una red social con intención y salir sin culpa (flujo en `docs/pantallas.md`) |
-| D2 | Plataforma / stack | HTML + CSS + JS vanilla, Tailwind con tokens propios, todo local (sin internet ni servidor). Ver `CLAUDE.md` → Stack |
+| D2 | Plataforma / stack | HTML + CSS + JS vanilla, Tailwind con tokens propios, todo local (sin internet ni servidor). Ver `CLAUDE.md` → Stack y `docs/spec-tecnico.md` → Estilos con Tailwind |
 | D3 | Nombre del sistema | PILAS ("ponerse las pilas": darse cuenta y actuar por decisión propia) |
 | D4 | Publicación | Sitio estático en Vercel (https://pilas-prototipo.vercel.app); cada push a `main` lo publica |
 
 Decisiones provisionales de producto (arranque sin reto, 4 emociones, tiempo
-indefinido, peso de las decisiones…): `docs/spec.md` §9.
+indefinido, peso de las decisiones…): `docs/spec-tecnico.md` §9.
 
 ## 5. Alcance
 

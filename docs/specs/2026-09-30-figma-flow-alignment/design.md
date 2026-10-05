@@ -7,7 +7,7 @@
 ## Overview
 
 The prototype stays a single-page vanilla app (`index.html` + `js/app.js`,
-`js/ui.js`, `js/data.js`, Tailwind tokens). No new modules, libraries or build
+`js/components/ui.js`, `js/data.js`, Tailwind tokens). No new modules, libraries or build
 steps are introduced. The feature is delivered as changes to three existing
 mechanisms:
 
@@ -81,7 +81,7 @@ goes to `home`; tapping a social app there enters the tree above at the
 ## Components and interfaces
 
 All components are functions inside the `app.js` IIFE or exports of `UI`
-(`js/ui.js`). Names in backticks are the real identifiers.
+(`js/components/ui.js`). Names in backticks are the real identifiers.
 
 ### Simulated phone — `renderers.home` (Req 1, 2)
 

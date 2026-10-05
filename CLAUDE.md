@@ -3,15 +3,15 @@
 Prototipo móvil de **una tarea**: abrir una red social con intención y salir
 sin culpa. Vertical = una sola tarea navegable de principio a fin.
 
-Lee en este orden: **`SPEC.md`** (rumbo, criterios G1–G8) → `docs/spec.md`
+Lee en este orden: **`SPEC.md`** (rumbo, criterios G1–G8) → `docs/spec-tecnico.md`
 (estado, pantallas, reglas técnicas) → `docs/design-system.md` (tokens,
 componentes, voz) → `docs/pantallas.md` (objetivo y copy de cada pantalla).
-Al retomar: lee además el `tasks.md` abierto en `docs/specs/`.
+Al retomar: si existe un `tasks.md` abierto en `docs/specs/`, léelo también.
 
 ## Stack
 
 - HTML + CSS + JS vanilla. Un solo `index.html`; cada pantalla es una
-  `<section data-screen="...">` que pinta `js/app.js`.
+  `<section data-screen="...">` que pinta el código de `js/` (ver "Cómo está armado el código").
 - Tailwind v3 con los tokens de `js/tailwind.config.js`: `css/tailwind.css`
   compilado (offline) + Play CDN (clases nuevas al vuelo con internet).
 - Rubik local (`assets/fonts/`), Lucide local (`js/vendor/`), `localStorage`.
@@ -26,7 +26,7 @@ estos comandos. Correr desde la raíz del proyecto.
 
 ```bash
 # Static check (sintaxis JS):
-node --check js/app.js && node --check js/ui.js && node --check js/data.js && node --check js/tailwind.config.js
+for f in $(find js -name '*.js' -not -path 'js/vendor/*'); do node --check "$f" || exit 1; done
 
 # Test suite (reglas del design system/spec, sin navegador):
 node --test tools/smoke.test.js
@@ -41,9 +41,19 @@ declara su verificación manual en `tasks.md` y `task-verifier` la reporta como
 
 ## Cómo está armado el código
 
-- `js/app.js`: `state`, `go(screen)`, `renderers[screen]()` devuelve HTML,
-  `onEnter[screen]()` efectos, `actions[...]` responde a `data-action`.
-- `js/ui.js`: componentes (button, iconButton, chip, emotionCard, character,
+- El código de la app son varios archivos `<script>` normales (sin módulos, para
+  que abra con doble clic) que comparten el mismo ámbito global. **El orden de
+  carga en `index.html` importa.** El mapa está al inicio de `js/app.js`:
+  - `js/core/`: `state` (estado y modo demo), `timers`, `storage`
+    (localStorage), `router` (`go(screen)`, `screen()` y `renderers`) y `flow`.
+  - `js/screens/flujo/` y `js/screens/pilas/`: una pantalla por archivo;
+    `renderers[screen]()` devuelve su HTML. `js/screens/onEnter.js`: efectos al
+    entrar a una pantalla.
+  - `js/components/`: todos los componentes. `ui.js` (abajo) y las piezas de
+    Hoy, Grupo y Yo: `bottomNav`, `focusRing` y las tarjetas y filas de retos.
+  - `js/sheets/`: hojas inferiores (avisos, check-in, salida, selector).
+  - `js/app.js`: `actions[...]` responde a `data-action`, listeners y arranque.
+- `js/components/ui.js`: componentes (button, iconButton, chip, emotionCard, character,
   emotionDot). Úsalos en vez de escribir botones o chips a mano.
 - `js/data.js`: contenido editable (emociones, intenciones, tiempos,
   alternativas, apps, datos de ejemplo).
@@ -51,8 +61,10 @@ declara su verificación manual en `tasks.md` y `task-verifier` la reporta como
   `text-ink-soft`, `rounded-card`, `p-md`, `text-title-lg`…), nunca hex sueltos.
 
 **Agregar una pantalla:** `<section class="screen" data-screen="x" hidden>` en
-`index.html` → `renderers.x = () => screen({ title, body, actions })` → acciones
-en `actions` → si hay clases nuevas, build de CSS.
+`index.html` → un archivo nuevo en `js/screens/` con
+`Object.assign(renderers, { x() { return screen({ title, body, actions }); } });`
+(y su `<script>` en `index.html`, después de `core/router.js`) → acciones en
+`actions` → si hay clases nuevas, build de CSS.
 
 **Aplicar un diseño de Figma:** el PNG va en `docs/figma/NN-nombre.png` (carpeta solo local: no se sube a GitHub). Ajusta
 solo esa pantalla, con tokens y componentes existentes; si Figma trae un color
@@ -62,7 +74,7 @@ o tamaño que no está en los tokens, pregunta antes de inventarlo.
 
 El proyecto base ya existe, así que se arranca en `/specify` (brainstorming
 solo si aparece algo nuevo):
-`/specify` (requirements.md → design.md, tomando `docs/spec.md` como fuente) →
+`/specify` (requirements.md → design.md, tomando `docs/spec-tecnico.md` como fuente) →
 `/planning-tasks` (tasks.md) → implementar tarea por tarea → `task-verifier`
 antes de marcar Done → `/commit` → `/plan-test-cases` (3 casos manuales).
 **Un solo spec de feature.** Si algo se atrasa, se recorta alcance.
