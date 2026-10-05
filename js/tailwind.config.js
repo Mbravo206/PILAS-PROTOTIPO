@@ -1,7 +1,6 @@
 // js/tailwind.config.js — tokens del design system PILAS v1.0 (docs/design-system.md)
-// Sirve para dos cosas:
-//  1) En el navegador, con el Play CDN (desarrollo, sin build).
-//  2) Con el CLI de Tailwind (tools/) para generar css/tailwind.css y que el prototipo abra SIN internet.
+// Lo lee el CLI de Tailwind (tools/ → npm run build:css) para generar css/tailwind.css, y así el prototipo abre SIN internet.
+// El index.html ya no carga el Play CDN ni este archivo: solo usa el css/tailwind.css ya generado.
 // Si cambian las emociones, editar aquí y en js/data.js.
 const pilasTailwind = {
   theme: {

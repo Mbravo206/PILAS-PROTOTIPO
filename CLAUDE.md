@@ -13,7 +13,7 @@ Al retomar: si existe un `tasks.md` abierto en `docs/specs/`, léelo también.
 - HTML + CSS + JS vanilla. Un solo `index.html`; cada pantalla es una
   `<section data-screen="...">` que pinta el código de `js/` (ver "Cómo está armado el código").
 - Tailwind v3 con los tokens de `js/tailwind.config.js`: `css/tailwind.css`
-  compilado (offline) + Play CDN (clases nuevas al vuelo con internet).
+  compilado (offline), sin CDN. Con clases nuevas, `npm run build:css`.
 - Rubik local (`assets/fonts/`), Lucide local (`js/vendor/`), `localStorage`.
 - Se abre con doble clic en `index.html`. Modo demo: `index.html?demo=1` o
   triple toque en la barra de estado (1 min = 5 s).

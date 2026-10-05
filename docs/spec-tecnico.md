@@ -19,7 +19,7 @@ El ícono de PILAS del celular abre **Hoy**; Hoy, Grupo, Descanso y Yo se navega
 | Decisión | Elección | Por qué |
 |---|---|---|
 | Lenguaje | HTML + CSS + JS vanilla | Sin build para correr; abre con doble clic |
-| Estilos | Tailwind con los tokens de `js/tailwind.config.js`: `css/tailwind.css` compilado (offline) + Play CDN (desarrollo con internet) | El pitch no depende del wifi |
+| Estilos | Tailwind con los tokens de `js/tailwind.config.js`: `css/tailwind.css` compilado (offline), sin CDN | El pitch no depende del wifi, y una red que bloquee el CDN no retrasa la carga |
 | Fuente | Rubik 400/500/700, archivos locales en `assets/fonts/` | Design system, offline |
 | Iconos | Lucide, copia local en `js/vendor/` | Design system, offline |
 | Datos | `localStorage` (con respaldo en memoria si falla) | Persistencia simple entre recargas |
@@ -46,7 +46,7 @@ Tailwind da estilo con **clases pequeñas escritas directamente en el HTML**, en
 
 - **Un solo lugar para el design system.** Los colores, la tipografía, los espacios, los radios y la sombra se definen una vez en `js/tailwind.config.js` (los *tokens*). El código solo usa esos nombres (`bg-primary`, `text-ink-soft`, `rounded-card`, `p-md`, `text-title-lg`) y nunca colores sueltos. Un color que no está en la guía de estilos no se puede usar sin agregarlo primero a los tokens, y eso respalda el criterio **G4** de `SPEC.md`. `tools/smoke.test.js` verifica que los tokens principales existan.
 - **Funciona sin internet.** `css/tailwind.css` es un archivo **generado**: Tailwind revisa las clases usadas en `index.html` y en `js/**/*.js`, y arma un CSS con solo esas. Va incluido en la carpeta, por eso la app abre con doble clic y sin conexión (criterio **G2**).
-- **Con internet, las clases nuevas se ven al instante.** El Play CDN del `index.html` genera al vuelo las clases que aún no estén en `tailwind.css`. Sin conexión no carga, y no pasa nada.
+- **Sin CDN.** Antes el `index.html` cargaba el Play CDN de Tailwind para generar clases al vuelo con internet. Se quitó: era un `<script>` bloqueante y en una red que bloquee `cdn.tailwindcss.com` la página tardaba unos 19 s en abrir. Se comprobó, recorriendo toda la app, que `tailwind.css` ya trae todas las clases que se usan.
 
 **Cómo se trabaja:**
 

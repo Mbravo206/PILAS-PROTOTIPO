@@ -15,13 +15,9 @@
   <meta property="og:image" content="https://pilas-prototipo.vercel.app/assets/brand/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- Estilos offline: Tailwind ya compilado con los tokens PILAS (regenerar con tools/ → npm run build:css) -->
+  <!-- Estilos: Tailwind ya compilado con los tokens PILAS; no usa CDN y funciona sin internet.
+       Si agregas clases de Tailwind nuevas, regenera el archivo: tools/ → npm run build:css -->
   <link rel="stylesheet" href="css/tailwind.css" />
-
-  <!-- Desarrollo con internet: Play CDN genera al vuelo las clases nuevas que aún no estén en tailwind.css.
-       Sin internet no carga y no pasa nada: queda tailwind.css. El config va DESPUÉS del CDN. -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind.config.js"></script>
 
   <!-- Iconos: Lucide (copia local, funciona sin internet) -->
   <script src="js/vendor/lucide.min.js"></script>
