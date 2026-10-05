@@ -61,7 +61,7 @@ npm run sync        # copia la app a ../ejecutable/ antes de entregar
 npm test            # pruebas automáticas de las reglas del design system
 ```
 
-Con internet, las clases de Tailwind nuevas se ven de inmediato (Play CDN). Para que también se vean **sin internet**, corre `build:css`.
+La app no usa el Play CDN de Tailwind: solo el `css/tailwind.css` ya generado, así abre rápido y sin internet. Si agregas clases de Tailwind nuevas, corre `build:css` para que se vean.
 
 ## Documentación
 
