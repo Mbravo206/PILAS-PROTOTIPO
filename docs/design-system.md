@@ -1,6 +1,6 @@
 # PILAS · Sistema de diseño v1.0
 > Grupo 7 · Diseño Interactivo UJTL · Fuentes: `PILAS · Sistema de diseño v1.0.html`, `DESIGN system view.pdf`, `pilas-ui/tailwind.config.js`
-> Leer junto con `pantallas.md` y `spec.md`. En código: `js/tailwind.config.js` (tokens) y `js/ui.js` (componentes).
+> Leer junto con `pantallas.md` y `spec-tecnico.md`. En código: `js/tailwind.config.js` (tokens) y `js/components/ui.js` (componentes).
 
 **Concepto:** ponerse las pilas es darse cuenta y actuar por decisión propia. Tono: tranquila, cercana, honesta.
 
@@ -71,11 +71,11 @@ Solo relleno, siempre con texto `ink`. **Nunca indican bien o mal.** Provisional
 | **IntentionSummary** | Lo que dijiste vs. lo que pasó, sin calificar. | sin usar por ahora (Hoy ya no lo muestra) |
 | **ListRow** | Filas de 56px: ajustes, redes con pausa, grupo. | Yo, Grupo |
 | **BottomSheet** | Sube en 200ms, fondo `ink` al 40%. Se cierra tocando fuera o "Ahora no". | `#sheet-layer` |
-| **BottomNav** | 4 destinos: Hoy · Grupo · Descanso · Yo. La pestaña actual lleva una píldora `primary` al 20% detrás del ícono, ícono más grueso y etiqueta en negrita. | `bottomNav()` en `app.js` |
+| **BottomNav** | 4 destinos: Hoy · Grupo · Descanso · Yo. La pestaña actual lleva una píldora `primary` al 20% detrás del ícono, ícono más grueso y etiqueta en negrita. | `bottomNav()` en `js/components/bottomNav.js` |
 | **Personaje** | Blob por emoción con cara: ojos + boca que cambia según la emoción (sonrisa en calma/alegría, zigzag en ansiedad, línea en aburrimiento). `face="minima"` (con cara) o `"ninguna"` (blob liso). Al tocarlo, parpadea. | `UI.character()` |
 | **Avatar** | De una emoción: personaje sobre `surface` con borde `line`. De una persona: círculo de un color propio y su inicial en `ink` (18px/700 sobre el morado, que da 4.4:1). Nunca dos personas con el mismo color. | `UI.avatar()`, `UI.personAvatar()` |
 | **Flor** | Regalo que un amigo manda en una nota. Mismo trazo grueso `ink` que el personaje. | `UI.flower()` |
-| **Screen / PauseScreen** | Esqueleto de pantalla (safe areas, título, acciones, nav) y plantilla de pausa a pantalla completa. | `screen()` en `app.js` |
+| **Screen / PauseScreen** | Esqueleto de pantalla (safe areas, título, acciones, nav) y plantilla de pausa a pantalla completa. | `screen()` en `js/core/router.js` |
 
 **Íconos:** Lucide, `strokeWidth 1.5`, 24px.
 

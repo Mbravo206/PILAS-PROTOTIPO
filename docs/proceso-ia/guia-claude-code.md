@@ -8,7 +8,7 @@ pierde** al cerrar la sesión con Claude Code.
 | Quieres guardar… | Dónde queda | Cómo |
 | --- | --- | --- |
 | Rumbo general, criterios G1–G8 | `SPEC.md` | A mano o pidiéndoselo a Claude |
-| Detalle técnico y decisiones provisionales | `docs/spec.md` | A mano o pidiéndoselo a Claude |
+| Detalle técnico y decisiones provisionales | `docs/spec-tecnico.md` | A mano o pidiéndoselo a Claude |
 | Tokens, componentes, voz | `docs/design-system.md` + `js/tailwind.config.js` | Cambiar los dos juntos |
 | Stack y comandos de verificación | `CLAUDE.md` | Ya están llenos |
 | Pantallas de Figma | `docs/figma/NN-nombre.png` (solo local, no se sube a GitHub) | Export PNG 1x desde Figma |
@@ -34,11 +34,11 @@ pierde** al cerrar la sesión con Claude Code.
 
 ## 3. Flujo liviano (recomendado para esta entrega)
 
-Gasta menos tokens: sin `/specify` ni `/planning-tasks` (la fuente es `docs/spec.md`).
+Gasta menos tokens: sin `/specify` ni `/planning-tasks` (la fuente es `docs/spec-tecnico.md`).
 
 | Paso | Escribe en Claude Code | Queda en |
 | --- | --- | --- |
-| 1 | "Crea docs/specs/2026-10-01-ajustes-finales/tasks.md con una tarea por pantalla a ajustar (06 a 13) más: emociones finales, alternativas de la 8, prueba en otro computador. Formato simple [ ] T1… Sin requirements ni design; la fuente es docs/spec.md." | `tasks.md` |
+| 1 | "Crea docs/specs/2026-10-01-ajustes-finales/tasks.md con una tarea por pantalla a ajustar (06 a 13) más: emociones finales, alternativas de la 8, prueba en otro computador. Formato simple [ ] T1… Sin requirements ni design; la fuente es docs/spec-tecnico.md." | `tasks.md` |
 | 2 | "Implementa T1 con docs/figma/06-llegada.png" | Código + Decision log de T1 |
 | 3 | `node --test tools/smoke.test.js` (o "corre la verificación de CLAUDE.md") | Pruebas en verde |
 | 4 | `/commit` | Commit de T1 |
@@ -50,7 +50,7 @@ Gasta menos tokens: sin `/specify` ni `/planning-tasks` (la fuente es `docs/spec
 
 | Paso | Escribe en Claude Code | Queda en |
 | --- | --- | --- |
-| 1 | `/specify` + "la tarea es la de SPEC.md D1; usa docs/spec.md y docs/pantallas.md como fuente; lo que falta es ajustar las pantallas a Figma y cerrar las decisiones de docs/spec.md §9" | `requirements.md` → `design.md` (aprobar cada uno) |
+| 1 | `/specify` + "la tarea es la de SPEC.md D1; usa docs/spec-tecnico.md y docs/pantallas.md como fuente; lo que falta es ajustar las pantallas a Figma y cerrar las decisiones de docs/spec-tecnico.md §9" | `requirements.md` → `design.md` (aprobar cada uno) |
 | 2 | `/planning-tasks` | `tasks.md` con T1, T2… |
 | 3 | "Implementa T1" | Código + Decision log de T1 |
 | 4 | "Verifica T1 con task-verifier" | PASS/FAIL → Outcome y `[x] Done` |

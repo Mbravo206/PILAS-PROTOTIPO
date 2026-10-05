@@ -1,5 +1,5 @@
 # PILAS · Pantallas de la app
-> v0.2 · Grupo 7 · Usa los tokens y componentes de `design-system.md`. El estado, las reglas técnicas y las decisiones están en `spec.md`.
+> v0.2 · Grupo 7 · Usa los tokens y componentes de `design-system.md`. El estado, las reglas técnicas y las decisiones están en `spec-tecnico.md`.
 
 **Tarea principal (prototipo vertical):** abrir una red social con intención y salir sin culpa.
 **Usuario:** Sami, 17 años, Bogotá. Entra a redes en automático en pausas de estudio y antes de dormir.
@@ -159,4 +159,4 @@ Desde `home`, el ícono PILAS abre **Hoy**. Hoy, Grupo, Descanso y Yo se navegan
 
 1. ¿Qué alternativas reales mencionaron los entrevistados para "¿Y si pruebas otra cosa primero?"
 2. ¿Qué emociones salieron del diagrama de afinidades? Hoy son 4 provisionales.
-3. ¿El botón oscuro de "Seguir el reto" y el texto plano de "Entrar igual" cuentan como patrón oscuro? Ver `docs/spec.md` §9.
+3. ¿El botón oscuro de "Seguir el reto" y el texto plano de "Entrar igual" cuentan como patrón oscuro? Ver `docs/spec-tecnico.md` §9.

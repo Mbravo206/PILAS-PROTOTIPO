@@ -1,5 +1,9 @@
-// js/ui.js — componentes del design system como funciones que devuelven HTML.
+// js/components/ui.js — componentes del design system como funciones que devuelven HTML.
 // Todas las acciones usan data-action / data-value; app.js las escucha con un solo listener.
+//
+// Componentes: button, textButton, iconButton, chip, emotionCard, toggle, tag (controles);
+//   character, emotionDot, avatar, personAvatar, flower, drawing, pilasIcon (dibujos en SVG).
+// Los colores y tamaños salen de los tokens de tailwind.config.js, nunca de valores sueltos.
 window.UI = (function () {
   const { EMO } = window.PILAS_DATA;
   const attrs = (action, value) =>

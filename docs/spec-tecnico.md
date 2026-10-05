@@ -26,6 +26,36 @@ El ícono de PILAS del celular abre **Hoy**; Hoy, Grupo, Descanso y Yo se navega
 | Navegación | SPA de un solo `index.html`, cambio de pantalla con JS | Un ejecutable que abre con doble clic |
 | Publicación | Sitio estático en Vercel (https://pilas-prototipo.vercel.app). Cada push a `main` lo publica | Probar en celular sin descargar nada |
 
+### Estilos con Tailwind: clases en el HTML
+
+Tailwind da estilo con **clases pequeñas escritas directamente en el HTML**, en lugar de un archivo de CSS con una regla por componente. Cada clase hace una sola cosa. Así se ve el botón principal de `js/components/ui.js`:
+
+```html
+<button class="bg-primary text-white rounded-full h-[52px] px-lg">Seguir</button>
+```
+
+| Clase | Qué hace |
+|---|---|
+| `bg-primary` | color de fondo `primary` del design system |
+| `text-white` | texto blanco (solo se usa sobre `primary`) |
+| `rounded-full` | esquinas totalmente redondeadas |
+| `h-[52px]` | alto de 52 px (área táctil ≥ 44 px) |
+| `px-lg` | espacio a los lados, de la escala `lg` del design system |
+
+**Por qué se eligió:**
+
+- **Un solo lugar para el design system.** Los colores, la tipografía, los espacios, los radios y la sombra se definen una vez en `js/tailwind.config.js` (los *tokens*). El código solo usa esos nombres (`bg-primary`, `text-ink-soft`, `rounded-card`, `p-md`, `text-title-lg`) y nunca colores sueltos. Un color que no está en la guía de estilos no se puede usar sin agregarlo primero a los tokens, y eso respalda el criterio **G4** de `SPEC.md`. `tools/smoke.test.js` verifica que los tokens principales existan.
+- **Funciona sin internet.** `css/tailwind.css` es un archivo **generado**: Tailwind revisa las clases usadas en `index.html` y en `js/**/*.js`, y arma un CSS con solo esas. Va incluido en la carpeta, por eso la app abre con doble clic y sin conexión (criterio **G2**).
+- **Con internet, las clases nuevas se ven al instante.** El Play CDN del `index.html` genera al vuelo las clases que aún no estén en `tailwind.css`. Sin conexión no carga, y no pasa nada.
+
+**Cómo se trabaja:**
+
+1. Se escribe la clase en el HTML de la pantalla o del componente (`js/screens/`, `js/components/ui.js`).
+2. Si es una clase nueva, se corre `npm run build:css` desde `tools/` para regenerar `css/tailwind.css`. `tailwind.css` no se edita a mano.
+3. Si el diseño pide un color o tamaño nuevo, primero se agrega a `js/tailwind.config.js`.
+
+Lo que Tailwind no cubre (marco del celular, animaciones, hoja inferior, `prefers-reduced-motion`) está en `css/styles.css`.
+
 ## 3. Estructura de archivos
 
 ```
@@ -37,8 +67,11 @@ pilas-prototipo/
 ├── js/
 │   ├── tailwind.config.js   # tokens del design system (colores, tipografía, espaciado, radios, sombra)
 │   ├── data.js              # emociones, tiempos, alternativas, apps, grupo, retos, mensajes y datos de ejemplo
-│   ├── ui.js                # componentes: button, textButton, iconButton, chip, emotionCard, character, avatar, personAvatar, flower, toggle…
-│   ├── app.js               # estado + router + pantallas + acciones + timers + localStorage
+│   ├── core/                # state, timers, storage (localStorage), router (go, screen, renderers), flow
+│   ├── screens/             # una pantalla por archivo: flujo/ (abrir una red) y pilas/ (Hoy, Grupo, Descanso, Yo) + onEnter.js
+│   ├── components/          # todos los componentes: ui.js (button, textButton, iconButton, chip, emotionCard, character, avatar, personAvatar, flower, toggle…) y las piezas de Hoy, Grupo y Yo (bottomNav, focusRing, retos)
+│   ├── sheets/              # hojas inferiores: avisos, check-in, salida, selector
+│   ├── app.js               # acciones (data-action), listeners y arranque; trae el mapa de todos los archivos
 │   └── vendor/lucide.min.js
 ├── assets/fonts/            # Rubik woff2
 ├── tools/                   # solo para regenerar css/tailwind.css y correr las pruebas
@@ -54,7 +87,7 @@ pilas-prototipo/
 ## 5. Estado
 
 ```js
-// js/app.js — sesión actual (se reinicia al volver al celular)
+// js/core/state.js — sesión actual (se reinicia al volver al celular)
 const state = {
   screen: "home",        // pantalla activa; la app arranca en el celular simulado
   app: null,             // red que se tocó
@@ -138,21 +171,22 @@ Resumen. El objetivo, el contenido y el copy de cada una están en `pantallas.md
 | Arranque | Sami empieza sin ningún reto; el aviso de reto solo sale si se une a uno | `data.js → challenges.selfDefault` |
 | Emociones | 4: Calma, Alegría, Ansiedad, Aburrimiento, en 2 × 2. Tristeza se quitó del selector. Provisionales hasta el diagrama de afinidades | `data.js → emotions` |
 | Tiempo | 5, 10, 15 min o "Indefinido" (sin aviso). "Ahora no" también entra sin tiempo | `data.js → times` |
-| Peso de las decisiones | La opción con intención va en botón oscuro; "Entrar igual" e "Igual quiero entrar" van en texto plano. **Riesgo:** puede leerse como patrón oscuro. Mitigación: siempre visible, 44 px, sin demora | `ui.js → textButton`, `app.js` |
-| Aviso de descanso o reto | Tocar fuera equivale a "Seguir". "Entrar igual" termina el descanso y lo guarda en el historial, sin penalización | `app.js → openInterstitial` |
+| Peso de las decisiones | La opción con intención va en botón oscuro; "Entrar igual" e "Igual quiero entrar" van en texto plano. **Riesgo:** puede leerse como patrón oscuro. Mitigación: siempre visible, 44 px, sin demora | `components/ui.js → textButton`, `screens/flujo/nota.js`, `screens/flujo/alternativa.js`, `sheets/avisoDescanso.js` |
+| Aviso de descanso o reto | Tocar fuera equivale a "Seguir". "Entrar igual" termina el descanso y lo guarda en el historial, sin penalización | `sheets/avisoDescanso.js → openInterstitial` |
 | Tocar fuera del aviso de tiempo | Cuenta como "5 min más" | `index.html → .sheet-backdrop` |
 | Responder a un amigo | "Enviar" vuelve a la nota con una confirmación y un solo botón, "Entrar a ‹red›" | `app.js → actions["reply-send"]` |
-| Cierre | 3 s; mensaje y color según la emoción de salida; tarjeta de PILAS si se pasó o llevó 20 min o más | `app.js → renderers.cierre` |
-| Navegación inferior | 4 destinos: Hoy · Grupo · Descanso · Yo; la actual lleva una píldora de baja opacidad | `app.js → bottomNav` |
+| Dejarle algo a un amigo (envío simulado) | Al enviar solo se muestra la confirmación "Le escribiste a ‹amigo›" en Hoy y se descarta el borrador: en el prototipo no existe otro usuario que reciba el mensaje. Las notas que **le llegan** a Sami antes de abrir una red son datos de ejemplo (`friendNotes`) y no vienen de lo que él envía | `app.js → actions["note-send"]`, `data.js → friendNotes` |
+| Cierre | 3 s; mensaje y color según la emoción de salida; tarjeta de PILAS si se pasó o llevó 20 min o más | `screens/flujo/cierre.js` |
+| Navegación inferior | 4 destinos: Hoy · Grupo · Descanso · Yo; la actual lleva una píldora de baja opacidad | `components/bottomNav.js → bottomNav` |
 | Ajuste "Pausa antes de abrir redes" | Apagado: abrir una red entra directo, sin nota ni check-in | `app.js → actions["open-app"]` |
 | Redes con pausa | Solo Instagram y TikTok, con la pausa encendida; el celular muestra las que estén encendidas | `data.js → apps` |
 | Grupo | Chips "En curso" o "✓ Cumplió"; sin tiempos ajenos (el propio es privado y opcional); 2 premiados; 2 retos | `data.js → group, challenges, rewarded` |
-| Avatares | Color propio por persona + inicial | `data.js → group.color`, `ui.js → personAvatar` |
-| Hoy | Sin "Tu última vez" ni lista de entradas; tarjeta "Crea un foco" que lleva a Descanso con 2 min | `app.js → renderers.inicio` |
-| Botones al celular | "Volver al inicio", "Ir al celular" y "Volver al celular" son amarillos con ícono de celular | `ui.js → button (variant phone)` |
+| Avatares | Color propio por persona + inicial | `data.js → group.color`, `components/ui.js → personAvatar` |
+| Hoy | Sin "Tu última vez" ni lista de entradas; tarjeta "Crea un foco" que lleva a Descanso con 2 min | `screens/pilas/inicio.js` |
+| Botones al celular | "Volver al inicio", "Ir al celular" y "Volver al celular" son amarillos con ícono de celular | `components/ui.js → button (variant phone)` |
 | Descanso | "Tus logros": 3 estadísticas simuladas con barra y % | `data.js → breakStats` |
 | Mensajes de amigos | Ligeros y sin compromisos ("Ey ey, ¡pilas con el cel!"); una nota puede traer una flor | `data.js → friendNotes` |
-| Cara del personaje | `face="minima"` (dos ojos) | `ui.js → character()` |
+| Cara del personaje | `face="minima"` (dos ojos) | `components/ui.js → character()` |
 | Alternativas | Las del borrador, pendientes de entrevistas | `data.js → alternatives` |
 
 **Pendientes de código** (ver `docs/specs/2026-09-30-figma-flow-alignment/design.md`, "Known gaps"):

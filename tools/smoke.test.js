@@ -9,11 +9,23 @@ const vm = require("node:vm");
 const root = path.join(__dirname, "..");
 const read = (f) => fs.readFileSync(path.join(root, f), "utf8");
 
-// Carga data.js y ui.js en un "window" falso
+// El código de la app está repartido en js/core, js/screens, js/components, js/sheets y js/app.js
+// (ver el mapa al inicio de js/app.js). Esto junta todo ese texto, sin data.js, components/ui.js, vendor ni la config de Tailwind.
+const readApp = () => {
+  const skip = new Set(["js/data.js", "js/components/ui.js", "js/tailwind.config.js"]);
+  const walk = (dir) => fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((e) => {
+    const rel = dir + "/" + e.name;
+    if (e.isDirectory()) return e.name === "vendor" ? [] : walk(rel);
+    return e.name.endsWith(".js") && !skip.has(rel) ? [rel] : [];
+  });
+  return walk("js").sort().map(read).join("\n");
+};
+
+// Carga data.js y components/ui.js en un "window" falso
 const ctx = { window: {} };
 vm.createContext(ctx);
 vm.runInContext(read("js/data.js"), ctx);
-vm.runInContext(read("js/ui.js"), ctx);
+vm.runInContext(read("js/components/ui.js"), ctx);
 const D = ctx.window.PILAS_DATA;
 const UI = ctx.window.UI;
 
@@ -53,7 +65,7 @@ test("Tus logros son porcentajes entre 0 y 100", () => {
 });
 
 test("cada acción de data-action tiene su handler en app.js", () => {
-  const src = read("js/app.js") + read("js/ui.js");
+  const src = readApp() + read("js/components/ui.js");
   const used = new Set([...src.matchAll(/action: "([a-z0-9-]+)"/g)].map((m) => m[1]));
   for (const m of src.matchAll(/data-action="([a-z0-9-]+)"/g)) used.add(m[1]);
   // "statusbar" y "note-type" los atienden listeners propios (triple toque / input), no `actions`.
@@ -81,7 +93,7 @@ test("el botón de icono siempre lleva aria-label", () => {
 });
 
 test("el copy no tiene emojis ni botones en MAYÚSCULAS", () => {
-  const src = read("js/app.js") + read("js/data.js");
+  const src = readApp() + read("js/data.js");
   assert.doesNotMatch(src, /\p{Extended_Pictographic}/u);
   const labels = [...src.matchAll(/button\("([^"]+)"/g)].map((m) => m[1]);
   for (const l of labels) assert.notEqual(l, l.toUpperCase(), l);
@@ -101,7 +113,7 @@ test("cada emoción tiene su animación react-<id> en styles.css (y respeta redu
 });
 
 test("el texto escrito por la persona se escapa antes de ir en un atributo", () => {
-  assert.match(read("js/app.js"), /value="\$\{esc\(state\.noteDraft\.custom\)\}"/);
+  assert.match(readApp(), /value="\$\{esc\(state\.noteDraft\.custom\)\}"/);
 });
 
 test("cada publicación del feed simulado tiene su imagen en assets/feed", () => {

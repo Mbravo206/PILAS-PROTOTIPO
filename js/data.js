@@ -1,5 +1,12 @@
 // js/data.js — contenido del prototipo (emociones, tiempos, alternativas, apps)
 // Las emociones son PROVISIONALES hasta cerrar el diagrama de afinidades.
+//
+// Aquí se cambian textos y datos sin tocar la lógica. Todos los datos son ficticios (ningún adolescente real).
+//   Abrir una red:   emotions, times, alternatives, apps, feedPosts, friendNotes, friendReplies, replyDolls
+//   Grupo y retos:   group, challenges, challengeSuggestions, rewarded, noteSuggestions
+//   Descanso:        breakTimes, breakSuggestion, breakStats, sampleBreaks
+//   Yo:              goals, goalSuggestions, achievements, focus, sampleEntries
+// Al final se expone todo en window.PILAS_DATA (más los atajos por id: EMO, APP, GROUP).
 window.PILAS_DATA = (function () {
   const emotions = [
     { id: "calma",        label: "Calma",        bg: "#6698CC", fill: "#4E7FB3", pause: "Llegas con calma. ¿Para qué entras?" },

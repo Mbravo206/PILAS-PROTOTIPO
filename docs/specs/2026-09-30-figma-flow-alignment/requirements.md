@@ -302,7 +302,7 @@ instead of compares.
 
 ## Out of scope
 
-- Onboarding screens (per `docs/spec.md` §1, already out of scope for the
+- Onboarding screens (per `docs/spec-tecnico.md` §1, already out of scope for the
   vertical prototype).
 - Real OS-level app-launch interception (Android Accessibility Service /
   iOS Screen Time). Requirement 2 only documents this as a future-work note.
