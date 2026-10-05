@@ -1,5 +1,5 @@
 PILAS - Prototipo vertical
-Examen de Seguimiento 2026-2S - Diseno Interactivo UJTL - Grupo 7
+
 
 COMO ABRIRLO
 1. Doble clic en index.html (Chrome, Edge o Firefox). No necesita internet ni instalar nada.
